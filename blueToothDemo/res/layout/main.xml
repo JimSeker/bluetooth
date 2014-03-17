@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+android:id="@+id/widget30"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:orientation="vertical"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+<TextView
+android:id="@+id/widget29"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:text="BlueTooth Demo"
+></TextView>
+<LinearLayout android:id="@+id/linearLayout1" android:layout_height="wrap_content" android:layout_width="match_parent">
+    <Button android:layout_height="wrap_content" android:text="Server" android:layout_width="wrap_content" android:id="@+id/btnServer"></Button>
+    <Button android:layout_height="wrap_content" android:text="Scan" android:layout_width="wrap_content" android:id="@+id/btnScan"></Button>
+    <Button android:text="Client" android:id="@+id/btnClient" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+</LinearLayout>
+<TextView
+android:id="@+id/output"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:text="output: "
+>
+</TextView>
+</LinearLayout>
