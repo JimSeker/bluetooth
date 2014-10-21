@@ -29,7 +29,7 @@ import android.widget.TextView;
 public class blueToothDemo extends Activity implements Button.OnClickListener {
 	BluetoothAdapter mBluetoothAdapter =null;
 	BluetoothDevice device;
-	private static final int REQUEST_ENABLE_BT = 2;
+	private static final int REQUEST_ENABLE_BT = 2;  
 	private static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
 	private static final String NAME = "BluetoothDemo";
 	BluetoothDevice remoteDevice;
