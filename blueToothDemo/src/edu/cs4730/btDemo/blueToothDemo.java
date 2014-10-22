@@ -139,6 +139,7 @@ public class blueToothDemo extends Activity implements Button.OnClickListener {
     		new Thread(new ConnectThread(device)).start();
     	}
     }
+    
     /**
      * This thread runs while listening for incoming connections. It behaves
      * like a server-side client. It runs until a connection is accepted

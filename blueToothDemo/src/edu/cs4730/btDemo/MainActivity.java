@@ -1,6 +1,7 @@
 package edu.cs4730.btDemo;
 
 import java.util.Locale;
+import java.util.UUID;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,8 @@ public class MainActivity extends FragmentActivity {
 	String TAG = "MainActivity";
 	SectionsPagerAdapter mSectionsPagerAdapter;
 
+	public static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+	public static final String NAME = "BluetoothDemo";
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
