@@ -6,13 +6,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Set;
+
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +29,7 @@ import android.widget.TextView;
  * 
  */
 public class Client_Fragment extends Fragment {
-
+	String TAG = "client";
 	TextView output;
 	Button btn_start, btn_device;
 	BluetoothAdapter mBluetoothAdapter =null;
@@ -57,15 +62,15 @@ public class Client_Fragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View myView = inflater.inflate(R.layout.fragment_client, container, false);
+
 		//output textview
 		output = (TextView) myView.findViewById(R.id.ct_output);
-		
 		btn_device = (Button) myView.findViewById(R.id.which_device);
-		btn_start.setOnClickListener( new View.OnClickListener(){
+		btn_device.setOnClickListener( new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				output.append("Starting server\n");
-				 startClient();
+				querypaired();
+				
 			}
 		});
 		btn_start = (Button) myView.findViewById(R.id.start_client);
@@ -73,11 +78,10 @@ public class Client_Fragment extends Fragment {
 		btn_start.setOnClickListener( new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				output.append("Starting server\n");
+				output.append("Starting client\n");
 				 startClient();
 			}
 		});
-		
 		//setup the bluetooth adapter.
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
@@ -86,21 +90,60 @@ public class Client_Fragment extends Fragment {
 			btn_start.setEnabled(false);
 			btn_device.setEnabled(false);
 		}
+		Log.v(TAG, "bluetooth");
+
 		return myView;
 	}
 
+	  
+    public void querypaired() {
+    	Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+    	// If there are paired devices
+    	if (pairedDevices.size() > 0) {
+    	    // Loop through paired devices
+    		output.append("at least 1 paired device\n");
+    		final BluetoothDevice blueDev[] = new BluetoothDevice[pairedDevices.size()];
+    		String[] items = new String[blueDev.length];
+    		int i =0;
+    		for (BluetoothDevice devicel : pairedDevices) {
+    			blueDev[i] = devicel;
+    	    	items[i] = blueDev[i].getName() + ": " + blueDev[i].getAddress();
+    	    	output.append("Device: "+items[i]+"\n");
+    	    	//mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+    	    	i++;
+    	    }
+    		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    		builder.setTitle("Choose Bluetooth:");
+    		builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+    		    public void onClick(DialogInterface dialog, int item) {
+    				dialog.dismiss();
+    				if (item >= 0 && item <blueDev.length) { 
+    					device = blueDev[item];
+    					btn_device.setText("device: "+blueDev[item].getName());
+    					btn_start.setEnabled(true);
+    				}
 
+    		    }
+    		});
+    		AlertDialog alert = builder.create();
+    		alert.show();
+    	}
+    }
+	
+	
     public void startClient() {
     	if (device != null) {   	
     		new Thread(new ConnectThread(device)).start();
     	}
     }
 
+    
     /**
      * This thread runs while attempting to make an outgoing connection
      * with a device. It runs straight through; the connection either
      * succeeds or fails.
      */
+	
     private class ConnectThread extends Thread {
         private BluetoothSocket socket;
         private final BluetoothDevice mmDevice;
@@ -183,4 +226,5 @@ public class Client_Fragment extends Fragment {
             }
         }
     }
+
 }

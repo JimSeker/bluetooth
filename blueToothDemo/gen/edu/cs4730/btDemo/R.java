@@ -25,23 +25,24 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int LinearLayout1=0x7f060002;
-        public static final int btnClient=0x7f06000f;
-        public static final int btnScan=0x7f06000e;
-        public static final int btnServer=0x7f06000d;
-        public static final int ct_output=0x7f060005;
-        public static final int linearLayout1=0x7f06000c;
-        public static final int logger1=0x7f060007;
-        public static final int output=0x7f060010;
-        public static final int pager=0x7f060000;
-        public static final int pager_header=0x7f060001;
-        public static final int start_client=0x7f060004;
-        public static final int start_server=0x7f060008;
-        public static final int sv_output=0x7f060009;
-        public static final int textView1=0x7f060006;
-        public static final int which_device=0x7f060003;
-        public static final int widget29=0x7f06000b;
-        public static final int widget30=0x7f06000a;
+        public static final int LinearLayout1=0x7f060001;
+        public static final int btnClient=0x7f060010;
+        public static final int btnScan=0x7f06000f;
+        public static final int btnServer=0x7f06000e;
+        public static final int button1=0x7f060007;
+        public static final int button2=0x7f060008;
+        public static final int ct_output=0x7f060004;
+        public static final int frag_container=0x7f060000;
+        public static final int linearLayout1=0x7f06000d;
+        public static final int logger1=0x7f060006;
+        public static final int output=0x7f060011;
+        public static final int start_client=0x7f060003;
+        public static final int start_server=0x7f060009;
+        public static final int sv_output=0x7f06000a;
+        public static final int textView1=0x7f060005;
+        public static final int which_device=0x7f060002;
+        public static final int widget29=0x7f06000c;
+        public static final int widget30=0x7f06000b;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;

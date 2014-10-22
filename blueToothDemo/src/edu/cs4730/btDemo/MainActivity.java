@@ -8,78 +8,47 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements Help_Fragment.Callbacks {
 
 	String TAG = "MainActivity";
-	SectionsPagerAdapter mSectionsPagerAdapter;
+	//SectionsPagerAdapter mSectionsPagerAdapter;
 
 	public static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
 	public static final String NAME = "BluetoothDemo";
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
-	ViewPager mViewPager;
-	
+	//ViewPager mViewPager;
+	FragmentManager fragmentManager;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the activity.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-		// Set up the ViewPager with the sections adapter.
-		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-		mViewPager.setCurrentItem(1);// set to the help screen.
-
+		fragmentManager = getSupportFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.frag_container, new Help_Fragment()).commit();
 		
 	}
-	/**
-	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-	 * one of the sections/tabs/pages.
-	 */
-	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-		public SectionsPagerAdapter(FragmentManager fm) {
-			super(fm);
+	@Override
+	public void onButtonSelected(int id) {
+		
+		FragmentTransaction transaction =fragmentManager.beginTransaction();
+		// Replace whatever is in the fragment_container view with this fragment,
+		if (id == 2) { //client
+			transaction.replace(R.id.frag_container, new Client_Fragment());
+		} else { //server
+			transaction.replace(R.id.frag_container, new Server_Fragment());
 		}
-
-		@Override
-		public Fragment getItem(int position) {
-			switch (position) {
-			  case 0: return new Server_Fragment();
-			  case 1: return new Help_Fragment();
-			  case 2: return new Client_Fragment();
-			  default: return null;
-			}
-		}
-
-		@Override
-		public int getCount() {
-			// Show X total pages.
-			return 8;
-		}
-
-		@Override
-		public CharSequence getPageTitle(int position) {
-			Locale l = Locale.getDefault();
-			switch (position) {
-			case 0:
-				return "Server";
-			case 1:
-				return "Help";
-			case 2:
-				return "Client";
-
-			}
-			return null;
-		}
+		// and add the transaction to the back stack so the user can navigate back
+		transaction.addToBackStack(null);
+		// Commit the transaction
+		transaction.commit();
 	}
 
 }
