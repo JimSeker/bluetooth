@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="edu.cs4730.btDemo.Client_Fragment" >
+
+    <Button
+        android:id="@+id/which_device"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Device: ?" />
+
+    <Button
+        android:id="@+id/start_client"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Client" />
+
+    <TextView
+        android:id="@+id/ct_output"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="Output:\n"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</LinearLayout>
