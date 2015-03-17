@@ -3,14 +3,10 @@ package edu.cs4730.btDemo;
 import java.util.Set;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,15 +21,15 @@ import android.widget.TextView;
 public class Help_Fragment extends Fragment {
 	
 	/**
-	 * This is for the button call backs to launch the server or client fragment.
+	 * This is the callback variable, for the button to launch the server or client fragment from the mainActivity.
 	 */
-	private Callbacks mCallbacks = sDummyCallbacks;
+    private OnFragmentInteractionListener mListener;
 	/**
 	 * A callback interface that all activities containing this fragment must
 	 * implement. This mechanism allows activities to be notified of item
 	 * selections.
 	 */
-	public interface Callbacks {
+	public interface OnFragmentInteractionListener {
 		/**
 		 * Callback for when an item has been selected.
 		 */
@@ -119,14 +115,16 @@ public class Help_Fragment extends Fragment {
 		btn_client.setOnClickListener( new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mCallbacks.onButtonSelected(2);
+                if (mListener != null) //don't call if null, duh...
+				   mListener.onButtonSelected(2);
 			}
 		});
 		btn_server = (Button)myView.findViewById(R.id.button1);
 		btn_server.setOnClickListener( new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mCallbacks.onButtonSelected(1);
+                if (mListener != null) //don't call if null, duh...
+				  mListener.onButtonSelected(1);
 			}
 		});
 		
@@ -155,31 +153,22 @@ public class Help_Fragment extends Fragment {
 	 * This is all for the callbacks.
 	 * 
 	 */
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		// Activities containing this fragment must implement its callbacks.
-		if (!(activity instanceof Callbacks)) {
-			throw new IllegalStateException(
-					"Activity must implement fragment's callbacks.");
-		}
-		mCallbacks = (Callbacks) activity;
-	}
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		// Reset the active callbacks interface to the dummy implementation.
-		mCallbacks = sDummyCallbacks;
-	}
-	/**
-	 * A dummy implementation of the {@link Callbacks} interface that does
-	 * nothing. Used only when this fragment is not attached to an activity.
-	 */
-	private static Callbacks sDummyCallbacks = new Callbacks() {
-		@Override
-		public void onButtonSelected(int id) {
-			; //nothing, this is dummy method.
-		}
-	};
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
 
 }

@@ -41,13 +41,14 @@ public class Client_Fragment extends Fragment {
 	}
 
 
-    private Handler handler = new Handler() {
+    private Handler handler =  new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
         	output.append(msg.getData().getString("msg"));
+            return true;
         }
 
-    };
+    });
     public void mkmsg(String str) {
 		//handler junk, because thread can't update screen!
 		Message msg = new Message();

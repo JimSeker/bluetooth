@@ -4,25 +4,16 @@ import java.util.Locale;
 import java.util.UUID;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
 
 
-public class MainActivity extends FragmentActivity implements Help_Fragment.Callbacks {
-
-	String TAG = "MainActivity";
-	//SectionsPagerAdapter mSectionsPagerAdapter;
+public class MainActivity extends ActionBarActivity implements Help_Fragment.OnFragmentInteractionListener {
 
 	public static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
 	public static final String NAME = "BluetoothDemo";
-	/**
-	 * The {@link ViewPager} that will host the section contents.
-	 */
-	//ViewPager mViewPager;
+
 	FragmentManager fragmentManager;
 	
 	@Override
