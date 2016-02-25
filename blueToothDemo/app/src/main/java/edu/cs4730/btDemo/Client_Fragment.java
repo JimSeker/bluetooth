@@ -158,7 +158,7 @@ public class Client_Fragment extends Fragment {
             try {
                 tmp = device.createRfcommSocketToServiceRecord(MainActivity.MY_UUID);
             } catch (IOException e) {
-                mkmsg("Client connection failed: "+e.getMessage().toString()+"\n");
+                mkmsg("Client connection failed: "+e.getMessage()+"\n");
             }
             socket = tmp;
  
@@ -180,7 +180,7 @@ public class Client_Fragment extends Fragment {
                     socket.close();
                     socket = null;
                 } catch (IOException e2) {
-                    mkmsg("unable to close() socket during connection failure: "+e2.getMessage().toString()+"\n");
+                    mkmsg("unable to close() socket during connection failure: "+e2.getMessage()+"\n");
                     socket = null;
                 }
                 // Start the service over to restart listening mode   
@@ -188,7 +188,7 @@ public class Client_Fragment extends Fragment {
            	// If a connection was accepted
         	if (socket != null) {
         		mkmsg("Connection made\n");
-        		mkmsg("Remote device address: "+socket.getRemoteDevice().getAddress().toString()+"\n");
+        		mkmsg("Remote device address: "+socket.getRemoteDevice().getAddress()+"\n");
         		//Note this is copied from the TCPdemo code.
         		try {
         			PrintWriter out = new PrintWriter( new BufferedWriter( new OutputStreamWriter(socket.getOutputStream())),true);
@@ -201,6 +201,9 @@ public class Client_Fragment extends Fragment {
         			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
         			String str = in.readLine();
         			mkmsg("received a message:\n" + str+"\n");
+
+
+
         			mkmsg("We are done, closing connection\n");
         		} catch(Exception e) {
         			mkmsg("Error happened sending/receiving\n");
@@ -223,7 +226,7 @@ public class Client_Fragment extends Fragment {
             try {
                 socket.close();
             } catch (IOException e) {
-               mkmsg( "close() of connect socket failed: "+e.getMessage().toString()+"\n");
+               mkmsg( "close() of connect socket failed: "+e.getMessage() +"\n");
             }
         }
     }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="edu.cs4730.btDemo.Server_Fragment" >
+    tools:context="edu.cs4730.btDemo.Server_Fragment">
 
     <Button
         android:id="@+id/start_server"
@@ -12,11 +12,15 @@
         android:layout_height="wrap_content"
         android:text="Start Server" />
 
-    <TextView
-        android:id="@+id/sv_output"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:text="output:\n"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/sv_output"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="output:\n"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </android.support.v4.widget.NestedScrollView>
 </LinearLayout>
