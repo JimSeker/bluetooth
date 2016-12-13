@@ -1,7 +1,0 @@
-#Mon Dec 12 17:33:15 MST 2016
-base.0=C\:\\Users\\seker\\git\\program3mine\\controller2\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_c9375eaf0bfbb52a8f96595dc8bdf19a3f03b83a
-renamed.1=classes.dex
-renamed.0=classes2.dex
-file.1=C\:\\Users\\seker\\git\\program3mine\\controller2\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_cd432df03299fde7e4da8576a6788a13120a225a\\classes.dex
-base.1=C\:\\Users\\seker\\git\\program3mine\\controller2\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run-bootstrap_cd432df03299fde7e4da8576a6788a13120a225a
-file.0=C\:\\Users\\seker\\git\\program3mine\\controller2\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10\\instant-run_c9375eaf0bfbb52a8f96595dc8bdf19a3f03b83a\\classes.dex
