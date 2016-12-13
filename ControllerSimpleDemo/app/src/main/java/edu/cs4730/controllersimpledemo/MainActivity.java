@@ -9,6 +9,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+/*
+ * A simple demo to show how to get input from a bluetooth controller
+ * See https://developer.android.com/training/game-controllers/controller-input.html
+ * for a lot more info
+*/
+
 public class MainActivity extends AppCompatActivity {
 
     TextView name, last, logger;
@@ -27,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //getting the "joystick" or dpad motion.
     @Override
     public boolean onGenericMotionEvent(android.view.MotionEvent motionEvent) {
         float xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_X);
@@ -61,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         return handled;
     }
 
+    //getting the buttons.  note, there is down and up action.  this only
+    //looks for down actions.
     @Override
     public boolean dispatchKeyEvent(android.view.KeyEvent event) {
         if ((event.getSource() & InputDevice.SOURCE_GAMEPAD)
