@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="C:\Users\seker\git\program3mine\controller2\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="f9388da6ca2aa59d1c25c608cacc98151d0da36a">
+        <dex dex="C:\Users\seker\git\program3mine\controller2\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_c9375eaf0bfbb52a8f96595dc8bdf19a3f03b83a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\seker\git\program3mine\controller2\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="e3fd8b9010ea9ddcf90c17c2f0f5d31bdcab9d88">
+        <dex dex="C:\Users\seker\git\program3mine\controller2\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_cd432df03299fde7e4da8576a6788a13120a225a\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Android\android-sdk\extras\android\m2repository\com\android\support\support-v4\18.0.0\support-v4-18.0.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="44ec51e9d395a47aab135e5e1b556c0007442156">
+        <dex dex="C:\Users\seker\git\program3mine\controller2\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-v4-18.0.0_3626930b7c6ab0d248ae4672a51b8283ea160e91\classes.dex" />
+    </item>
+
+</items>
