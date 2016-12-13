@@ -39,11 +39,17 @@ public class MainActivity extends AppCompatActivity {
         float xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_X);
         float yaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_Y);
 
+        if ( ((Float.compare(motionEvent.getAxisValue(MotionEvent.AXIS_X), 0.0f) != 0)) ||
+             ((Float.compare(motionEvent.getAxisValue(MotionEvent.AXIS_Y), 0.0f) != 0))  )   {
+            xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_X);
+            yaxis = motionEvent.getAxisValue(MotionEvent.AXIS_Y);
+        }
+
         boolean handled = false;
         // Check if the AXIS_HAT_X value is -1 or 1, and set the D-pad
         // LEFT and RIGHT direction accordingly.
         if (Float.compare(xaxis, -1.0f) == 0) {
-           // Dpad.LEFT;
+            // Dpad.LEFT;
             last.setText("Dpad Left");
             handled = true;
         } else if (Float.compare(xaxis, 1.0f) == 0) {
@@ -61,9 +67,15 @@ public class MainActivity extends AppCompatActivity {
             // Dpad.DOWN;
             last.setText("Dpad Down");
             handled = true;
+        } else if ((Float.compare(xaxis, 0.0f) == 0)
+                && (Float.compare(yaxis, 0.0f) == 0)) {
+            //Dpad.center
+            last.setText("Dpad centered");
+            handled = true;
         }
+
         if (!handled) {
-            logger.append("dPad: X " + xaxis + " Y " + yaxis +"\n");
+            logger.append("dPad: X " + xaxis + " Y " + yaxis + "\n");
         }
         return handled;
     }
@@ -93,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 logger.append("code is " + event.getKeyCode() + "\n");
+            } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                //don't care, but need to handle it.
+            } else {
+                logger.append("unknown action " + event.getAction());
             }
             return true;
         }
@@ -113,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     || ((sources & InputDevice.SOURCE_JOYSTICK)
                     == InputDevice.SOURCE_JOYSTICK)) {
                 // This device is a game controller. Store its device ID.
-                name.setText(dev.getName() );
+                name.setText(dev.getName());
                 if (!gameControllerDeviceIds.contains(deviceId)) {
                     gameControllerDeviceIds.add(deviceId);
                 }
