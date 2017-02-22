@@ -125,9 +125,8 @@ public class MainActivity extends AppCompatActivity {
             int sources = dev.getSources();
 
             // Verify that the device has gamepad buttons, control sticks, or both.
-            if (((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)
-                    || ((sources & InputDevice.SOURCE_JOYSTICK)
-                    == InputDevice.SOURCE_JOYSTICK)) {
+            if (       ((sources & InputDevice.SOURCE_GAMEPAD)  == InputDevice.SOURCE_GAMEPAD)
+                    || ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)) {
                 // This device is a game controller. Store its device ID.
                 name.setText(dev.getName());
                 if (!gameControllerDeviceIds.contains(deviceId)) {
