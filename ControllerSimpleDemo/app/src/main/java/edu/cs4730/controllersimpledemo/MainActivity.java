@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     TextView name, last, logger;
 
+    Boolean isJoyStick = false, isGamePad = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,54 +29,68 @@ public class MainActivity extends AppCompatActivity {
         last = (TextView) findViewById(R.id.lastBtn);
         logger = (TextView) findViewById(R.id.logger);
 
-        getGameControllerIds();
+       // getGameControllerIds();
 
     }
 
+    @Override
+    public void onResume () {
+        super.onResume();  // Always call the superclass method first
+        getGameControllerIds();
+    }
 
     //getting the "joystick" or dpad motion.
     @Override
     public boolean onGenericMotionEvent(android.view.MotionEvent motionEvent) {
-        float xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_X);
-        float yaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_Y);
+        float xaxis =0.0f, yaxis=0.0f;
+        boolean handled = false;
 
-        if ( ((Float.compare(motionEvent.getAxisValue(MotionEvent.AXIS_X), 0.0f) != 0)) ||
-             ((Float.compare(motionEvent.getAxisValue(MotionEvent.AXIS_Y), 0.0f) != 0))  )   {
+        //if both are true, this code will show both JoyStick and dpad.  Which one you want to use is
+        // up to you
+        if (isJoyStick) {
             xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_X);
             yaxis = motionEvent.getAxisValue(MotionEvent.AXIS_Y);
+            logger.append("JoyStick: X " + xaxis + " Y " + yaxis + "\n");
+            handled =true;
         }
 
-        boolean handled = false;
-        // Check if the AXIS_HAT_X value is -1 or 1, and set the D-pad
-        // LEFT and RIGHT direction accordingly.
-        if (Float.compare(xaxis, -1.0f) == 0) {
-            // Dpad.LEFT;
-            last.setText("Dpad Left");
-            handled = true;
-        } else if (Float.compare(xaxis, 1.0f) == 0) {
-            // Dpad.RIGHT;
-            last.setText("Dpad Right");
-            handled = true;
-        }
-        // Check if the AXIS_HAT_Y value is -1 or 1, and set the D-pad
-        // UP and DOWN direction accordingly.
-        else if (Float.compare(yaxis, -1.0f) == 0) {
-            // Dpad.UP;
-            last.setText("Dpad Up");
-            handled = true;
-        } else if (Float.compare(yaxis, 1.0f) == 0) {
-            // Dpad.DOWN;
-            last.setText("Dpad Down");
-            handled = true;
-        } else if ((Float.compare(xaxis, 0.0f) == 0)
-                && (Float.compare(yaxis, 0.0f) == 0)) {
-            //Dpad.center
-            last.setText("Dpad centered");
-            handled = true;
-        }
+        if (isGamePad) {
+            xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_X);
+            yaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_Y);
 
-        if (!handled) {
-            logger.append("dPad: X " + xaxis + " Y " + yaxis + "\n");
+
+            // Check if the AXIS_HAT_X value is -1 or 1, and set the D-pad
+            // LEFT and RIGHT direction accordingly.
+            if (Float.compare(xaxis, -1.0f) == 0) {
+                // Dpad.LEFT;
+                last.setText("Dpad Left");
+                handled = true;
+            } else if (Float.compare(xaxis, 1.0f) == 0) {
+                // Dpad.RIGHT;
+                last.setText("Dpad Right");
+                handled = true;
+            }
+            // Check if the AXIS_HAT_Y value is -1 or 1, and set the D-pad
+            // UP and DOWN direction accordingly.
+            else if (Float.compare(yaxis, -1.0f) == 0) {
+                // Dpad.UP;
+                last.setText("Dpad Up");
+                handled = true;
+            } else if (Float.compare(yaxis, 1.0f) == 0) {
+                // Dpad.DOWN;
+                last.setText("Dpad Down");
+                handled = true;
+            } else if ((Float.compare(xaxis, 0.0f) == 0)
+                    && (Float.compare(yaxis, 0.0f) == 0)) {
+                //Dpad.center
+                last.setText("Dpad centered");
+                handled = true;
+            }
+            if (!handled) {
+                last.setText("Unknown");
+                logger.append("unhandled: X " + xaxis + " Y " + yaxis + "\n");
+            }
+
         }
         return handled;
     }
@@ -132,7 +147,13 @@ public class MainActivity extends AppCompatActivity {
                 if (!gameControllerDeviceIds.contains(deviceId)) {
                     gameControllerDeviceIds.add(deviceId);
                 }
+                //possible both maybe true.
+                if ((sources & InputDevice.SOURCE_GAMEPAD)  == InputDevice.SOURCE_GAMEPAD) isGamePad= true;
+                if ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) isJoyStick = true;
+                logger.append("GamePad: " + isGamePad + "\n");
+                logger.append("JoyStick: " + isJoyStick+"\n");
             }
+
         }
         return gameControllerDeviceIds;
     }
