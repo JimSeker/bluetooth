@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         if (isJoyStick) {
             xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_X);
             yaxis = motionEvent.getAxisValue(MotionEvent.AXIS_Y);
+
+            last.setText("JoyStick");
             logger.append("JoyStick: X " + xaxis + " Y " + yaxis + "\n");
             handled =true;
         }
@@ -57,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         if (isGamePad) {
             xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_X);
             yaxis = motionEvent.getAxisValue(MotionEvent.AXIS_HAT_Y);
-
 
             // Check if the AXIS_HAT_X value is -1 or 1, and set the D-pad
             // LEFT and RIGHT direction accordingly.
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     //looks for down actions.
     @Override
     public boolean dispatchKeyEvent(android.view.KeyEvent event) {
+        boolean handled = false;
         if ((event.getSource() & InputDevice.SOURCE_GAMEPAD)
                 == InputDevice.SOURCE_GAMEPAD) {
 
@@ -106,29 +108,33 @@ public class MainActivity extends AppCompatActivity {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_BUTTON_X:
                         last.setText("X Button");
+                        handled = true;
                         break;
                     case KeyEvent.KEYCODE_BUTTON_A:
                         last.setText("A Button");
+                        handled = true;
                         break;
                     case KeyEvent.KEYCODE_BUTTON_Y:
                         last.setText("Y Button");
+                        handled = true;
                         break;
                     case KeyEvent.KEYCODE_BUTTON_B:
                         last.setText("B Button");
+                        handled = true;
                         break;
-
                 }
-
-                logger.append("code is " + event.getKeyCode() + "\n");
+                if (!handled)
+                  logger.append("code is " + event.getKeyCode() + "\n");
             } else if (event.getAction() == KeyEvent.ACTION_UP) {
                 //don't care, but need to handle it.
+                handled = true;
             } else {
                 logger.append("unknown action " + event.getAction());
             }
-            return true;
+            return handled;
         }
 
-        return false;
+        return handled;
     }
 
     //From Google's page on controller-input
