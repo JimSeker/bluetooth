@@ -1,5 +1,6 @@
 package edu.cs4730.controllersimpledemo;
 
+import android.annotation.SuppressLint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.InputDevice;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
  * See https://developer.android.com/training/game-controllers/controller-input.html
  * for a lot more info
 */
-
+@SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity {
 
     TextView name, last, logger;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //getting the "joystick" or dpad motion.
+
     @Override
     public boolean onGenericMotionEvent(android.view.MotionEvent motionEvent) {
         float xaxis =0.0f, yaxis=0.0f;
