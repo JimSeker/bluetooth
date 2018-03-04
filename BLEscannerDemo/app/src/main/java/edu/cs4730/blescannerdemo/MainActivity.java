@@ -4,7 +4,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
+//https://arnhem.luminis.eu/creating-a-bluetooth-low-energy-central-implementation-on-android/
 public class MainActivity extends AppCompatActivity implements Help_Fragment.OnFragmentInteractionListener{
 
     public static final int REQUEST_ACCESS_COURSE_LOCATION= 1;
