@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -42,6 +43,7 @@ public class ListenerFragment extends Fragment {
     Button btn_start, btn_stop;
     TextView logger;
     static final String TAG = "serverFragment";
+    private OnFragmentInteractionListener mListener;
 
     //lisview stuff
     myArrayAdapter myAdapter;
@@ -51,6 +53,14 @@ public class ListenerFragment extends Fragment {
     public ListenerFragment() {
         // Required empty public constructor
         myList = new ArrayList<BluetoothDevice>();
+    }
+
+
+    public interface OnFragmentInteractionListener {
+        /**
+         * Callback for when an item has been selected.
+         */
+        public void onDeviceSelected(BluetoothDevice d);
     }
 
 
@@ -88,7 +98,12 @@ public class ListenerFragment extends Fragment {
         } else {
             adapter = bluetoothManager.getAdapter();
         }
-
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mListener.onDeviceSelected( myList.get(position));
+            }
+        });
         return myView;
     }
 
@@ -135,12 +150,24 @@ public class ListenerFragment extends Fragment {
         }
     }
 
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
 
     public void logthis(String msg) {
         //logger.append(msg + "\n");

@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="edu.cs4730.blescannerdemo.GattFragment">
+
+    <Button
+        android:id="@+id/start_gatt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="start" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="nothing yet" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/gattlogger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Logger:\n" />
+    </ScrollView>
+
+
+</LinearLayout>
