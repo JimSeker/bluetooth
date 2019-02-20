@@ -11,7 +11,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License./blue
  */
 
 package com.example.controllersample;
@@ -48,7 +48,7 @@ import java.util.Random;
  * a bullet is fired or the ship crashes into an obstacle. Otherwise, the system
  * vibrator is used for that purpose.
  */
-@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
+//@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
 public class GameView extends View implements InputDeviceListener {
     private static final int MAX_OBSTACLES = 12;
 
@@ -1015,7 +1015,8 @@ public class GameView extends View implements InputDeviceListener {
                     255, mR, mG, mB,
                     0, 255, 0, 0);
 
-            canvas.save(Canvas.MATRIX_SAVE_FLAG);
+           // canvas.save(Canvas.MATRIX_SAVE_FLAG);  depreciated in 28.
+            canvas.save();  //works, but doesn't produce all it correctly.  don't know how to fix it either.
             canvas.translate(mPositionX, mPositionY);
             canvas.rotate(mHeadingAngle * TO_DEGREES);
             canvas.drawPath(mPath, mPaint);

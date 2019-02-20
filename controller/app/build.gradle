@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.example.controllersample"
-        minSdkVersion 16
-        targetSdkVersion 27
+        minSdkVersion 19
+        targetSdkVersion 28
     }
 
     buildTypes {
@@ -19,5 +18,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:27.1.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
 }
