@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BluetoothLEperipheral</string>
+    <string name="ble_uuid">00001802-0000-1000-8000-00805f9b34fb</string>
+</resources>

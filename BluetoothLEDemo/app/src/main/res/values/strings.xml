@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">BluetoothLEDemo</string>
+    <string name="blue_uuid">00001802-0000-1000-8000-00805f9b34fb</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>

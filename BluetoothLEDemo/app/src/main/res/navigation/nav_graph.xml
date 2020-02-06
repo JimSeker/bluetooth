@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/helpFragment">
+
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="edu.cs4730.bluetoothledemo.HelpFragment"
+        android:label="fragment_help"
+        tools:layout="@layout/fragment_help" >
+        <action
+            android:id="@+id/action_help_to_advertise"
+            app:destination="@id/advertiseFragment" />
+        <action
+            android:id="@+id/action_help_to_discover"
+            app:destination="@id/discoverFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/advertiseFragment"
+        android:name="edu.cs4730.bluetoothledemo.AdvertiseFragment"
+        android:label="fragment_advertise"
+        tools:layout="@layout/fragment_advertise" />
+    <fragment
+        android:id="@+id/discoverFragment"
+        android:name="edu.cs4730.bluetoothledemo.DiscoverFragment"
+        android:label="fragment_discover"
+        tools:layout="@layout/fragment_discover" />
+</navigation>
