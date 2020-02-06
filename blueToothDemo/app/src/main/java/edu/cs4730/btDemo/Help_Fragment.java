@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,23 +22,6 @@ import android.widget.TextView;
  * A simple {@link Fragment} subclass.
  */
 public class Help_Fragment extends Fragment {
-
-    /**
-     * This is the callback variable, for the button to launch the server or client fragment from the mainActivity.
-     */
-    private OnFragmentInteractionListener mListener;
-
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of item
-     * selections.
-     */
-    public interface OnFragmentInteractionListener {
-        /**
-         * Callback for when an item has been selected.
-         */
-        public void onButtonSelected(int id);
-    }
 
 
     //bluetooth device and code to turn the device on if needed.
@@ -115,27 +99,14 @@ public class Help_Fragment extends Fragment {
 
 
         btn_client = myView.findViewById(R.id.button2);
-        btn_client.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) //don't call if null, duh...
-                    mListener.onButtonSelected(2);
-            }
-        });
+        btn_client.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_help_to_client, null));
         btn_server = myView.findViewById(R.id.button1);
-        btn_server.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) //don't call if null, duh...
-                    mListener.onButtonSelected(1);
-            }
-        });
+        btn_server.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_help_to_server, null));
 
         startbt();
 
         return myView;
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -150,27 +121,4 @@ public class Help_Fragment extends Fragment {
             }
         }
     }
-
-
-    /**
-     * This is all for the callbacks.
-     */
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mListener = (OnFragmentInteractionListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(getActivity().toString()
-                + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-
 }
