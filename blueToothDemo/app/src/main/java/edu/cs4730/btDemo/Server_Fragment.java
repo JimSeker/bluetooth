@@ -13,7 +13,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,9 +39,9 @@ public class Server_Fragment extends Fragment {
         // Inflate the layout for this fragment
         View myView = inflater.inflate(R.layout.fragment_server, container, false);
         //text field for output info.
-        output = (TextView) myView.findViewById(R.id.sv_output);
+        output = myView.findViewById(R.id.sv_output);
 
-        btn_start = (Button) myView.findViewById(R.id.start_server);
+        btn_start = myView.findViewById(R.id.start_server);
 
         btn_start.setOnClickListener(new View.OnClickListener() {
             @Override

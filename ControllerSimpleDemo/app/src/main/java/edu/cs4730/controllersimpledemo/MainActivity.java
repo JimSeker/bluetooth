@@ -1,7 +1,9 @@
 package edu.cs4730.controllersimpledemo;
 
 import android.annotation.SuppressLint;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.view.InputDevice;
 import android.view.KeyEvent;
@@ -10,32 +12,33 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/*
+/**
  * A simple demo to show how to get input from a bluetooth controller
  * See https://developer.android.com/training/game-controllers/controller-input.html
  * for a lot more info
-*/
+ */
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity {
 
     TextView name, last, logger;
 
     Boolean isJoyStick = false, isGamePad = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        name = (TextView) findViewById(R.id.Name);
-        last = (TextView) findViewById(R.id.lastBtn);
-        logger = (TextView) findViewById(R.id.logger);
+        name = findViewById(R.id.Name);
+        last = findViewById(R.id.lastBtn);
+        logger = findViewById(R.id.logger);
 
-       // getGameControllerIds();
+        // getGameControllerIds();
 
     }
 
     @Override
-    public void onResume () {
+    public void onResume() {
         super.onResume();  // Always call the superclass method first
         getGameControllerIds();
     }
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onGenericMotionEvent(android.view.MotionEvent motionEvent) {
-        float xaxis =0.0f, yaxis=0.0f;
+        float xaxis = 0.0f, yaxis = 0.0f;
         boolean handled = false;
 
         //if both are true, this code will show both JoyStick and dpad.  Which one you want to use is
@@ -55,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
             last.setText("JoyStick");
             logger.append("JoyStick: X " + xaxis + " Y " + yaxis + "\n");
-            handled =true;
+            handled = true;
         }
 
         if (isGamePad) {
@@ -84,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 last.setText("Dpad Down");
                 handled = true;
             } else if ((Float.compare(xaxis, 0.0f) == 0)
-                    && (Float.compare(yaxis, 0.0f) == 0)) {
+                && (Float.compare(yaxis, 0.0f) == 0)) {
                 //Dpad.center
                 last.setText("Dpad centered");
                 handled = true;
@@ -104,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean dispatchKeyEvent(android.view.KeyEvent event) {
         boolean handled = false;
         if ((event.getSource() & InputDevice.SOURCE_GAMEPAD)
-                == InputDevice.SOURCE_GAMEPAD) {
+            == InputDevice.SOURCE_GAMEPAD) {
 
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 switch (event.getKeyCode()) {
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 if (!handled)
-                  logger.append("code is " + event.getKeyCode() + "\n");
+                    logger.append("code is " + event.getKeyCode() + "\n");
             } else if (event.getAction() == KeyEvent.ACTION_UP) {
                 //don't care, but need to handle it.
                 handled = true;
@@ -148,18 +151,20 @@ public class MainActivity extends AppCompatActivity {
             int sources = dev.getSources();
 
             // Verify that the device has gamepad buttons, control sticks, or both.
-            if (       ((sources & InputDevice.SOURCE_GAMEPAD)  == InputDevice.SOURCE_GAMEPAD)
-                    || ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)) {
+            if (((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)
+                || ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)) {
                 // This device is a game controller. Store its device ID.
                 name.setText(dev.getName());
                 if (!gameControllerDeviceIds.contains(deviceId)) {
                     gameControllerDeviceIds.add(deviceId);
                 }
                 //possible both maybe true.
-                if ((sources & InputDevice.SOURCE_GAMEPAD)  == InputDevice.SOURCE_GAMEPAD) isGamePad= true;
-                if ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) isJoyStick = true;
+                if ((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)
+                    isGamePad = true;
+                if ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)
+                    isJoyStick = true;
                 logger.append("GamePad: " + isGamePad + "\n");
-                logger.append("JoyStick: " + isJoyStick+"\n");
+                logger.append("JoyStick: " + isJoyStick + "\n");
             }
 
         }

@@ -1,9 +1,9 @@
 package edu.cs4730.blescannerdemo;
 
 import android.bluetooth.BluetoothDevice;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 //https://arnhem.luminis.eu/creating-a-bluetooth-low-energy-central-implementation-on-android/
 public class MainActivity extends AppCompatActivity implements Help_Fragment.OnFragmentInteractionListener,

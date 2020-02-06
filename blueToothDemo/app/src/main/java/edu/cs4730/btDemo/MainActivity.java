@@ -3,11 +3,11 @@ package edu.cs4730.btDemo;
 import java.util.UUID;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
 
-/*
+/**
  * most of the work is done in the fragments.  You will need to install this example onto 2 devices
  * with bluetooth in order to make this example work.
  *

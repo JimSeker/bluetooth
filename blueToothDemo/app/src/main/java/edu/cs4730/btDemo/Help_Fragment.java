@@ -5,9 +5,12 @@ import java.util.Set;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,10 +78,10 @@ public class Help_Fragment extends Fragment {
         }
     }
 
-    /*
+    /**
      * This method will query the bluetooth device and ask for a list of all
      * paired devices.  It will then display to the screen the name of the device and the address
-     *   In client fragment we need this address to so we can connect to the bluetooth device that is acting as the server.
+     * In client fragment we need this address to so we can connect to the bluetooth device that is acting as the server.
      */
 
     public void querypaired() {
@@ -108,10 +111,10 @@ public class Help_Fragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View myView = inflater.inflate(R.layout.fragment_help, container, false);
-        logger = (TextView) myView.findViewById(R.id.logger1);
+        logger = myView.findViewById(R.id.logger1);
 
 
-        btn_client = (Button) myView.findViewById(R.id.button2);
+        btn_client = myView.findViewById(R.id.button2);
         btn_client.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,7 +122,7 @@ public class Help_Fragment extends Fragment {
                     mListener.onButtonSelected(2);
             }
         });
-        btn_server = (Button) myView.findViewById(R.id.button1);
+        btn_server = myView.findViewById(R.id.button1);
         btn_server.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,18 +152,17 @@ public class Help_Fragment extends Fragment {
     }
 
 
-    /*
+    /**
      * This is all for the callbacks.
-     *
      */
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) getActivity();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new ClassCastException(getActivity().toString()
+                + " must implement OnFragmentInteractionListener");
         }
     }
 

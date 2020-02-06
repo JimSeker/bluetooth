@@ -16,10 +16,11 @@
 
 package com.example.controllersample;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-public class GameViewActivity extends Activity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class GameViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
