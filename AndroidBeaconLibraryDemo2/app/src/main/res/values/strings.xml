@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AndroidBeaconLibraryDemo2</string>
+    <string name="title_home">Home</string>
+    <string name="title_notifications">Range</string>
+</resources>

@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "edu.cs4730.androidbeaconlibrarydemo2"
+        minSdkVersion 24
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.navigation:navigation-fragment:2.3.2'
+    implementation 'androidx.navigation:navigation-ui:2.3.2'
+    //for LiveData and ViewModel
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    // ViewModel
+   // implementation "androidx.lifecycle:lifecycle-viewmodel:2.2.0"
+    // LiveData
+  //  implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
+
+ //   implementation "androidx.lifecycle:lifecycle-process:2.2.0"
+
+    //recyclerview and cardview.
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    //the beacon library.
+    implementation 'org.altbeacon:android-beacon-library:2+'
+    //needed for the beacon library, hopefully in 2.17.1+ they fix the error.
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+}
