@@ -17,6 +17,7 @@ like any other network code.
 <b>BluetoothLEperipheral</b> is an all in one BLE example I got from another example and updated.
 
 <b>AndroidBeaconLibraryDemo</b> Based on the https://altbeacon.github.io/android-beacon-library/index.html library, it looks for a displays beacons.  This is a very simple example.
+
 <b>AndroidBeaconLibraryDemo2</b> Based on the https://altbeacon.github.io/android-beacon-library/index.html library, displays the monitor in one fragment and range information another fragment.
 
 
