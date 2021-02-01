@@ -129,9 +129,8 @@ public class Help_Fragment extends Fragment {
     }
 
 
-    /*
-     * This is all for the callbacks.
-     *
+    /**
+     * This is all for the callbacks
      */
     @Override
     public void onAttach(Context context) {

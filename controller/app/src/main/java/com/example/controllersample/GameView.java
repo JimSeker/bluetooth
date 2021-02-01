@@ -490,6 +490,9 @@ public class GameView extends View implements InputDeviceListener {
      */
     private static boolean isFireKey(int keyCode) {
         return KeyEvent.isGamepadButton(keyCode)
+            //added, because fire is working anymore.
+            || (keyCode >=8 && keyCode<=11)  //seems to be the a,x,y and b buttons on my device.
+            //their stuff.
                 || keyCode == KeyEvent.KEYCODE_DPAD_CENTER
                 || keyCode == KeyEvent.KEYCODE_SPACE;
     }
