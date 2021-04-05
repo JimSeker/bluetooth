@@ -114,14 +114,20 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
      * helper method to send strings to both the logcat and to a textview call logger.
      */
     private void logthis(String item, int which) {
-        Log.v(TAG, item);
-        if (which ==1) {
-              mViewModel.setItem(item);
-        } else if (which ==2) {
-            if (rangeFrag != null) {
-                rangeFrag.logthis(item);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.v(TAG, item);
+                if (which ==1) {
+                    mViewModel.setItem(item);
+                } else if (which ==2) {
+                    if (rangeFrag != null) {
+                        rangeFrag.logthis(item);
+                    }
+                }
             }
-        }
+        });
+
     }
 
 
@@ -176,7 +182,13 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 logthis("didRangeBeaconsInRegion called with beacon count:  " + beacons.size(), 2);
-                mViewModel.setMlist(beacons);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mViewModel.setMlist(beacons);
+                    }
+                });
+
             }
         });
 

@@ -106,7 +106,13 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
      */
     private void logthis(String item) {
         Log.v(TAG, item);
-        logger.append("\n" + item);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                logger.append("\n" + item);
+            }
+        });
+
     }
 
     /**
