@@ -1,5 +1,6 @@
 package edu.cs4730.androidbeaconlibrarydemo2;
 
+import android.Manifest;
 import android.content.Context;
 
 import android.content.pm.PackageInfo;
@@ -11,6 +12,9 @@ import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -29,6 +33,7 @@ import org.altbeacon.beacon.Region;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
@@ -37,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     private static final int PERMISSION_REQUESTS = 1;
     HomeFragment homeFrag;
     RangeFragment rangeFrag;
-   myViewModel mViewModel;
+    myViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,26 +54,25 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        if (item.getItemId() == R.id.navigation_home) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.container, homeFrag)
-                                    .commit();
-                            return true;
-                        } else if (item.getItemId() == R.id.navigation_notifications) {
-                            getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.container, rangeFrag)
-                                    .commit();
-                            return true;
-                        }
-                        return false;
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    if (item.getItemId() == R.id.navigation_home) {
+                        getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, homeFrag)
+                            .commit();
+                        return true;
+                    } else if (item.getItemId() == R.id.navigation_notifications) {
+                        getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, rangeFrag)
+                            .commit();
+                        return true;
                     }
-
+                    return false;
                 }
-        );
 
+            }
+        );
 
 
         logthis("App Starting", 0);
@@ -85,10 +89,11 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
         homeFrag = new HomeFragment();
         rangeFrag = new RangeFragment();
+        checkpermissions();
 
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, homeFrag)
-                .commit();
+            .add(R.id.container, homeFrag)
+            .commit();
 
     }
 
@@ -102,12 +107,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     @Override
     protected void onResume() {
         super.onResume();
-        if (allPermissionsGranted()) {
-            logthis("Starting beaconManager", 0);
-            beaconManager.bind(this);
-        } else {
-            getRuntimePermissions();
-        }
+
+        logthis("Starting beaconManager", 0);
+        beaconManager.bind(this);
+
     }
 
     /**
@@ -118,9 +121,9 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
             @Override
             public void run() {
                 Log.v(TAG, item);
-                if (which ==1) {
+                if (which == 1) {
                     mViewModel.setItem(item);
-                } else if (which ==2) {
+                } else if (which == 2) {
                     if (rangeFrag != null) {
                         rangeFrag.logthis(item);
                     }
@@ -148,16 +151,18 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                 //should always be "myMonitoringUniqueId"  see startMonitoringBeaconsInRegion below, since I set it to that.
                 //I could add more regions, based on different args.  my are all null to find everything.  I need to see how find altbeacons vs eddystones.
             }
+
             //Called when no beacons in a Region are visible.
             @Override
             public void didExitRegion(Region region) {
                 logthis("I no longer see any beacons", 1);
 
             }
+
             //Called with a state value of MonitorNotifier.INSIDE when at least one beacon in a Region is visible.
             @Override
             public void didDetermineStateForRegion(int state, Region region) {
-                String stat = (state ==MonitorNotifier.INSIDE) ? "Inside" : "Outside";
+                String stat = (state == MonitorNotifier.INSIDE) ? "Inside" : "Outside";
                 logthis("I have just switched from seeing/not seeing beacons: " + stat, 1);
 
             }
@@ -195,71 +200,34 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
     }
 
-    /**
-     * below is all the pieces to get the permissions setup correctly and basically have nothing to do with beacons
-     * See the manifest file for all the permissions this app is using.
-     */
-
-    private void getRuntimePermissions() {
-        List<String> allNeededPermissions = new ArrayList<>();
-        for (String permission : getRequiredPermissions()) {
-            if (!isPermissionGranted(this, permission)) {
-                allNeededPermissions.add(permission);
+    private ActivityResultLauncher<String[]> mPermissionResult = registerForActivityResult(
+        new ActivityResultContracts.RequestMultiplePermissions(),
+        new ActivityResultCallback<Map<String, Boolean>>() {
+            @Override
+            public void onActivityResult(Map<String, Boolean> result) {
+                for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+                    Log.wtf(TAG, entry.getKey() + " " + entry.getValue());
+                }
             }
-        }
+        });
 
-        if (!allNeededPermissions.isEmpty()) {
-            ActivityCompat.requestPermissions(
-                    this, allNeededPermissions.toArray(new String[0]), PERMISSION_REQUESTS);
-        }
-    }
-
-    private boolean allPermissionsGranted() {
-        for (String permission : getRequiredPermissions()) {
-            if (!isPermissionGranted(this, permission)) {
-                return false;
+    //until this runs as api31, don't know if needs scan or connect, so just leaving it.
+    void checkpermissions() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED)) {
+                mPermissionResult.launch(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION});
             }
-        }
-        return true;
-    }
 
-    private String[] getRequiredPermissions() {
-        try {
-            PackageInfo info =
-                    this.getPackageManager()
-                            .getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
-            String[] ps = info.requestedPermissions;
-            if (ps != null && ps.length > 0) {
-                return ps;
-            } else {
-                return new String[0];
-            }
-        } catch (Exception e) {
-            return new String[0];
+        } else if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+            (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) ||
+            (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            //I'm on not explaining why, just asking for permission.
+            mPermissionResult.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_BACKGROUND_LOCATION});
+        } else {
+            Log.wtf(TAG, "We have permissions ");
         }
     }
-
-
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode, String[] permissions, int[] grantResults) {
-        Log.i(TAG, "Permission granted!");
-        if (allPermissionsGranted()) {
-            logthis("Starting beaconManager", 0);
-            beaconManager.bind(this);
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    private static boolean isPermissionGranted(Context context, String permission) {
-        if (ContextCompat.checkSelfPermission(context, permission)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Permission granted: " + permission);
-            return true;
-        }
-        Log.i(TAG, "Permission NOT granted: " + permission);
-        return false;
-    }
-
 
 }

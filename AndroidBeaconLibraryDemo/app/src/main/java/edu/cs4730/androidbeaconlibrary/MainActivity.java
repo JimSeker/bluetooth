@@ -1,11 +1,15 @@
 package edu.cs4730.androidbeaconlibrary;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -27,6 +31,7 @@ import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * very beginning of a beacon replacement example since google is dropping all support.
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_TLM_LAYOUT));
         // Detect the URL frame:
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
+        checkpermissions();
 
     }
 
@@ -89,15 +95,12 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
             beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
-        if (allPermissionsGranted()) {
-            logthis("Starting beaconManager");
-            beaconManager.bind(this);
-        } else {
-            getRuntimePermissions();
-        }
+        logthis("Starting beaconManager");
+        beaconManager.bind(this);
     }
 
 
@@ -112,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                 logger.append("\n" + item);
             }
         });
-
     }
 
     /**
@@ -176,8 +178,8 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                         Identifier namespaceId = beacon.getId1();
                         Identifier instanceId = beacon.getId2();
                         logthis("I see a beacon transmitting namespace id: " + namespaceId +
-                                " and instance id: " + instanceId +
-                                " approximately " + beacon.getDistance() + " meters away.");
+                            " and instance id: " + instanceId +
+                            " approximately " + beacon.getDistance() + " meters away.");
 
                         // Do we have telemetry data?
                         if (beacon.getExtraDataFields().size() > 0) {
@@ -187,10 +189,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                             long uptime = beacon.getExtraDataFields().get(4);
 
                             logthis(
-                                    "The above beacon is sending telemetry version " + telemetryVersion +
-                                            ", has been up for : " + uptime + " seconds" +
-                                            ", has a battery level of " + batteryMilliVolts + " mV" +
-                                            ", and has transmitted " + pduCount + " advertisements.");
+                                "The above beacon is sending telemetry version " + telemetryVersion +
+                                    ", has been up for : " + uptime + " seconds" +
+                                    ", has a battery level of " + batteryMilliVolts + " mV" +
+                                    ", and has transmitted " + pduCount + " advertisements.");
 
                         }
 
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                         // This is a Eddystone-URL frame
                         String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
                         logthis("I see a beacon transmitting a url: " + url +
-                                " approximately " + beacon.getDistance() + " meters away.");
+                            " approximately " + beacon.getDistance() + " meters away.");
                     } else {
                         //no clue what we found here.
                         logthis("found a beacon, (not eddy) " + beacon.toString() + " and is approximately " + beacon.getDistance() + "meters away");
@@ -215,66 +217,34 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
      * below is all the pieces to get the permissions setup correctly and basically have nothing to do with beacons
      * See the manifest file for all the permissions this app is using.
      */
-
-    private void getRuntimePermissions() {
-        List<String> allNeededPermissions = new ArrayList<>();
-        for (String permission : getRequiredPermissions()) {
-            if (!isPermissionGranted(this, permission)) {
-                allNeededPermissions.add(permission);
+    private ActivityResultLauncher<String[]> mPermissionResult = registerForActivityResult(
+        new ActivityResultContracts.RequestMultiplePermissions(),
+        new ActivityResultCallback<Map<String, Boolean>>() {
+            @Override
+            public void onActivityResult(Map<String, Boolean> result) {
+                for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+                    Log.wtf(TAG, entry.getKey() + " " + entry.getValue());
+                }
             }
-        }
+        });
 
-        if (!allNeededPermissions.isEmpty()) {
-            ActivityCompat.requestPermissions(
-                    this, allNeededPermissions.toArray(new String[0]), PERMISSION_REQUESTS);
-        }
-    }
-
-    private boolean allPermissionsGranted() {
-        for (String permission : getRequiredPermissions()) {
-            if (!isPermissionGranted(this, permission)) {
-                return false;
+    //until this runs as api31, don't know if needs scan or connect, so just leaving it.
+    void checkpermissions() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED)) {
+                mPermissionResult.launch(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION});
             }
-        }
-        return true;
-    }
 
-    private String[] getRequiredPermissions() {
-        try {
-            PackageInfo info =
-                    this.getPackageManager()
-                            .getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
-            String[] ps = info.requestedPermissions;
-            if (ps != null && ps.length > 0) {
-                return ps;
-            } else {
-                return new String[0];
-            }
-        } catch (Exception e) {
-            return new String[0];
+        } else if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+            (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) ||
+            (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            //I'm on not explaining why, just asking for permission.
+            mPermissionResult.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_BACKGROUND_LOCATION});
+        } else {
+            Log.wtf(TAG, "We have permissions ");
         }
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode, String[] permissions, int[] grantResults) {
-        Log.i(TAG, "Permission granted!");
-        if (allPermissionsGranted()) {
-            logthis("Starting beaconManager");
-            beaconManager.bind(this);
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    private static boolean isPermissionGranted(Context context, String permission) {
-        if (ContextCompat.checkSelfPermission(context, permission)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Permission granted: " + permission);
-            return true;
-        }
-        Log.i(TAG, "Permission NOT granted: " + permission);
-        return false;
     }
 
 }

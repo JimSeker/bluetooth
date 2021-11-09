@@ -49,7 +49,7 @@ public class RangeFragment extends Fragment {
 
 
         //setup the view model first.
-        mViewModel = new ViewModelProvider(getActivity()).get(myViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(myViewModel.class);
         mViewModel.getBeaconlist().observe(getViewLifecycleOwner(), new Observer<Collection<Beacon>>() {
             @Override
             public void onChanged(@Nullable Collection<Beacon> data) {
