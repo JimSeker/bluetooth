@@ -8,21 +8,13 @@
         android:id="@+id/help_Fragment"
         android:name="edu.cs4730.btDemo.Help_Fragment"
         android:label="fragment_help"
-        tools:layout="@layout/fragment_help" >
+        tools:layout="@layout/fragment_help">
         <action
             android:id="@+id/action_help_to_client"
-            app:destination="@id/client_Fragment"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_open_enter"
-            app:popExitAnim="@anim/fragment_open_exit" />
+            app:destination="@id/client_Fragment" />
         <action
             android:id="@+id/action_help_to_server"
-            app:destination="@id/server_Fragment"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_open_enter"
-            app:popExitAnim="@anim/fragment_open_exit" />
+            app:destination="@id/server_Fragment" />
     </fragment>
     <fragment
         android:id="@+id/client_Fragment"

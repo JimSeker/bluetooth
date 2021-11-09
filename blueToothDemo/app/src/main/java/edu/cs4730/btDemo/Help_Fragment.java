@@ -2,13 +2,22 @@ package edu.cs4730.btDemo;
 
 import java.util.Set;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -23,6 +32,7 @@ import android.widget.TextView;
  */
 public class Help_Fragment extends Fragment {
 
+    ActivityResultLauncher<Intent> someActivityResultLauncher;
 
     //bluetooth device and code to turn the device on if needed.
     BluetoothAdapter mBluetoothAdapter = null;
@@ -54,7 +64,7 @@ public class Help_Fragment extends Fragment {
         if (!mBluetoothAdapter.isEnabled()) {
             mkmsg("There is bluetooth, but turned off");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            someActivityResultLauncher.launch(enableBtIntent);
         } else {
             mkmsg("The bluetooth is ready to use.");
             //bluetooth is on, so list paired devices from here.
@@ -103,22 +113,56 @@ public class Help_Fragment extends Fragment {
         btn_server = myView.findViewById(R.id.button1);
         btn_server.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_help_to_server, null));
 
-        startbt();
+        //startbt();
 
         return myView;
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_ENABLE_BT) {
-            //bluetooth result code.
-            if (resultCode == Activity.RESULT_OK) {
-                mkmsg("Bluetooth is on.");
-                querypaired();
+    public void onResume() {
+        super.onResume();
+        checkpermissions();
+    }
+
+    void checkpermissions() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            if ((ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) ) {
+                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN},
+                    MainActivity.REQUEST_BLUETOOTH);
+                mkmsg("Android 12, we need scan and connect permissions.");
             } else {
-                mkmsg("Please turn the bluetooth on.");
+                mkmsg("Android 12, we have scan and connect permissions.");
+                startbt();
             }
+        } else {
+            mkmsg("Below Android 12, no permissions needed.");
+            startbt();
         }
     }
+
+
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        someActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        Intent data = result.getData();
+                        mkmsg("Bluetooth is on.");
+                        querypaired();
+                    } else {
+                        mkmsg("Please turn the bluetooth on.");
+                    }
+                }
+            });
+    }
+
+
 }

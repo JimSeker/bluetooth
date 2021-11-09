@@ -7,9 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +34,7 @@ public class Help_Fragment extends Fragment {
      * This is the callback variable, for the button to launch the server or client fragment from the mainActivity.
      */
     private OnFragmentInteractionListener mListener;
+    ActivityResultLauncher<Intent> someActivityResultLauncher;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -52,7 +59,6 @@ public class Help_Fragment extends Fragment {
         // Required empty public constructor
     }
 
-
     //This code will check to see if there is a bluetooth device and
     //turn it on if is it turned off.
     public void startbt() {
@@ -66,7 +72,7 @@ public class Help_Fragment extends Fragment {
         if (!mBluetoothAdapter.isEnabled()) {
             logthis("There is bluetooth, but turned off");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            someActivityResultLauncher.launch(enableBtIntent);
         } else {
             logthis("The bluetooth is ready to use.");
         }
@@ -90,23 +96,10 @@ public class Help_Fragment extends Fragment {
             }
         });
         startbt();
-        checkpermissions();
+        logthis("We have permission to course location");
         return myView;
     }
 
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_ENABLE_BT) {
-            //bluetooth result code.
-            if (resultCode == Activity.RESULT_OK) {
-                logthis("Bluetooth is on.");
-            } else {
-                logthis("Please turn the bluetooth on.");
-            }
-        }
-    }
 
     @Override
     public void onResume() {
@@ -115,16 +108,24 @@ public class Help_Fragment extends Fragment {
     }
 
     void checkpermissions() {
-        //first check to see if I have permissions (marshmallow) if I don't then ask, otherwise start up the demo.
-        if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-            (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) )   {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            if ((ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) ) {
+                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN},
+                    MainActivity.REQUEST_ACCESS_COURSE_LOCATION);
+            }
+            logthis("Android 12, we need scan and connect.");
+        } else if ((ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+            (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+            (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) ||
+            (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED)) {
             //I'm on not explaining why, just asking for permission.
-            logthis( "asking for permissions");
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+            logthis("asking for permissions");
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH},
                 MainActivity.REQUEST_ACCESS_COURSE_LOCATION);
             logthis("We don't have permission to course location");
         } else {
-            logthis("We have permission to course location");
+            logthis("We have permissions ");
         }
     }
 
@@ -136,11 +137,25 @@ public class Help_Fragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            mListener = (OnFragmentInteractionListener) getActivity();
+            mListener = (OnFragmentInteractionListener) requireActivity();
         } catch (ClassCastException e) {
-            throw new ClassCastException(getActivity().toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new ClassCastException(requireActivity().toString()
+                + " must implement OnFragmentInteractionListener");
         }
+        someActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        Intent data = result.getData();
+                        logthis("Bluetooth is on.");
+                    } else {
+                        logthis("Please turn the bluetooth on.");
+                    }
+                }
+            });
     }
 
     @Override

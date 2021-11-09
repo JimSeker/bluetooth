@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity  {
     public static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
     public static final String NAME = "BluetoothDemo";
 
+    public static final int REQUEST_BLUETOOTH= 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
