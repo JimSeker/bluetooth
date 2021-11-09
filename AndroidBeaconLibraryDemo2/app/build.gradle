@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "edu.cs4730.androidbeaconlibrarydemo2"
         minSdkVersion 26
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
@@ -41,7 +41,5 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.cardview:cardview:1.0.0'
     //the beacon library.
-    implementation 'org.altbeacon:android-beacon-library:2.18-beta'
-    //needed for the beacon library, hopefully in 2.17.1+ they fix the error.
-   // implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+    implementation 'org.altbeacon:android-beacon-library:2.19.3'
 }

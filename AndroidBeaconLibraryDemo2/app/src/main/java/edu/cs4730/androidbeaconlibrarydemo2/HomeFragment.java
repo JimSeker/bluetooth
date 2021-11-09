@@ -51,16 +51,4 @@ public class HomeFragment extends Fragment {
     }
 
 
-
-
-    /**
-     * This is all for the callbacks
-     */
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-    }
-
-
 }

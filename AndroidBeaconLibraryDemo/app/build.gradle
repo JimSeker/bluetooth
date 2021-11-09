@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "edu.cs4730.androidbeaconlibrary"
         minSdkVersion 26
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
@@ -34,9 +34,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
-    //implementation 'org.altbeacon:android-beacon-library:2+'
-    implementation 'org.altbeacon:android-beacon-library:2.18-beta'
-    //needed for the beacon library.
-   // implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+    implementation 'org.altbeacon:android-beacon-library:2.19.3'
+
 
 }

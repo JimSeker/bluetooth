@@ -19,15 +19,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 
 
 import java.util.ArrayList;
@@ -35,7 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements BeaconConsumer {
+public class MainActivity extends AppCompatActivity {
 
     private BeaconManager beaconManager;
     private static final String TAG = "MainActivity";
@@ -53,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         mViewModel = new ViewModelProvider(this).get(myViewModel.class);
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        navView.setOnNavigationItemSelectedListener(
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
+        navView.setOnItemSelectedListener(
+            new BottomNavigationView.OnItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     if (item.getItemId() == R.id.navigation_home) {
@@ -97,22 +100,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        beaconManager.unbind(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        logthis("Starting beaconManager", 0);
-        beaconManager.bind(this);
-
-    }
-
     /**
      * helper method to send strings to both the logcat and to a textview call logger.
      */
@@ -135,57 +122,41 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
 
     /**
-     * This is the beacon "listener" piece.  called from the "this" in bind/unbind.
+     * Setup and start the observers here.
      */
+    void startexample() {
+        logthis("Starting up!",1);
+        // Set up a Live Data observer so this Activity can get monitoring callbacks
+        // observer will be called each time the monitored regionState changes (inside vs. outside region)
+        Region myRegion = new Region("myMonitoringUniqueId", null, null, null);
+        //first the monitor
 
-    @Override
-    public void onBeaconServiceConnect() {
-        beaconManager.removeAllMonitorNotifiers();
-        beaconManager.addMonitorNotifier(new MonitorNotifier() {
-            //Called when at least one beacon in a Region is visible.
-            @Override
-            public void didEnterRegion(Region region) {
-                logthis("I can see at least one or more beacons.", 1);
-                // all the region variables appear to be null, because I set them that way?
-                logthis("the region ID is " + region.getUniqueId(), 1);
-                //should always be "myMonitoringUniqueId"  see startMonitoringBeaconsInRegion below, since I set it to that.
-                //I could add more regions, based on different args.  my are all null to find everything.  I need to see how find altbeacons vs eddystones.
+        beaconManager.getRegionViewModel(myRegion).getRegionState().observe(this, new Observer<Integer>() {
+                @Override
+                public void onChanged(Integer state) {
+                    if (state == MonitorNotifier.INSIDE) {
+                        logthis("I can see at least one or more beacons.", 1);
+                        // all the region variables appear to be null, because I set them that way?
+                        logthis("the region ID is " + myRegion.getUniqueId(), 1);
+                    }
+                    else {
+                        logthis("I no longer see any beacons", 1);
+
+                    }
+                }
             }
 
-            //Called when no beacons in a Region are visible.
+
+        );
+        beaconManager.startMonitoring(myRegion);
+        logthis("beacon monitor observer has been added.",1);
+
+
+        //now the ranged information.
+        logthis("beacon range observer has been added.",2);
+        beaconManager.getRegionViewModel(myRegion).getRangedBeacons().observe(this, new Observer<Collection<Beacon>>() {
             @Override
-            public void didExitRegion(Region region) {
-                logthis("I no longer see any beacons", 1);
-
-            }
-
-            //Called with a state value of MonitorNotifier.INSIDE when at least one beacon in a Region is visible.
-            @Override
-            public void didDetermineStateForRegion(int state, Region region) {
-                String stat = (state == MonitorNotifier.INSIDE) ? "Inside" : "Outside";
-                logthis("I have just switched from seeing/not seeing beacons: " + stat, 1);
-
-            }
-        });
-
-        try {
-            beaconManager.startMonitoringBeaconsInRegion(new Region("myMonitoringUniqueId", null, null, null));
-            logthis("beacon monitor listener has been added.", 1);
-        } catch (RemoteException e) {
-            logthis("FAILED beacon monitor listener has been added." + e.toString(), 1);
-        }
-
-        //Now add a ranged beacon info
-        Region region = new Region("all-beacons-region", null, null, null);
-        try {
-            beaconManager.startRangingBeaconsInRegion(region);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        beaconManager.addRangeNotifier(new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+            public void onChanged(Collection<Beacon> beacons) {
                 logthis("didRangeBeaconsInRegion called with beacon count:  " + beacons.size(), 2);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -193,12 +164,12 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                         mViewModel.setMlist(beacons);
                     }
                 });
-
             }
         });
-
-
+        beaconManager.startRangingBeacons(myRegion);
     }
+
+
 
     private ActivityResultLauncher<String[]> mPermissionResult = registerForActivityResult(
         new ActivityResultContracts.RequestMultiplePermissions(),
@@ -207,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
             public void onActivityResult(Map<String, Boolean> result) {
                 for (Map.Entry<String, Boolean> entry : result.entrySet()) {
                     Log.wtf(TAG, entry.getKey() + " " + entry.getValue());
+                    startexample();
                 }
             }
         });
@@ -215,9 +187,13 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     void checkpermissions() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             if ((ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED)) {
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
                 mPermissionResult.launch(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION});
+                logthis("Android 12: Asking for  have permissions ",1);
+            } else {
+                logthis("Android 12: We have permissions ",1);
+                startexample();
             }
 
         } else if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
@@ -226,7 +202,8 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
             //I'm on not explaining why, just asking for permission.
             mPermissionResult.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_BACKGROUND_LOCATION});
         } else {
-            Log.wtf(TAG, "We have permissions ");
+            logthis("We have permissions ",1);
+            startexample();
         }
     }
 
