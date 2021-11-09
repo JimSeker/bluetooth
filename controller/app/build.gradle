@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "com.example.controllersample"
-        minSdkVersion 24
-        targetSdkVersion 30
+        minSdkVersion 26
+        targetSdkVersion 31
     }
 
     buildTypes {
@@ -19,5 +19,5 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
 }
