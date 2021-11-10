@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     HomeFragment homeFrag;
     RangeFragment rangeFrag;
     myViewModel mViewModel;
+    Region myRegion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,21 +126,21 @@ public class MainActivity extends AppCompatActivity {
      * Setup and start the observers here.
      */
     void startexample() {
-        logthis("Starting up!",1);
+        logthis("Starting up!", 1);
         // Set up a Live Data observer so this Activity can get monitoring callbacks
         // observer will be called each time the monitored regionState changes (inside vs. outside region)
-        Region myRegion = new Region("myMonitoringUniqueId", null, null, null);
+        myRegion = new Region("myMonitoringUniqueId", null, null, null);
         //first the monitor
 
         beaconManager.getRegionViewModel(myRegion).getRegionState().observe(this, new Observer<Integer>() {
                 @Override
                 public void onChanged(Integer state) {
+                    logthis("monitor change", 1);
                     if (state == MonitorNotifier.INSIDE) {
                         logthis("I can see at least one or more beacons.", 1);
                         // all the region variables appear to be null, because I set them that way?
                         logthis("the region ID is " + myRegion.getUniqueId(), 1);
-                    }
-                    else {
+                    } else {
                         logthis("I no longer see any beacons", 1);
 
                     }
@@ -149,11 +150,11 @@ public class MainActivity extends AppCompatActivity {
 
         );
         beaconManager.startMonitoring(myRegion);
-        logthis("beacon monitor observer has been added.",1);
+        logthis("beacon monitor observer has been added.", 1);
 
 
         //now the ranged information.
-        logthis("beacon range observer has been added.",2);
+        logthis("beacon range observer has been added.", 2);
         beaconManager.getRegionViewModel(myRegion).getRangedBeacons().observe(this, new Observer<Collection<Beacon>>() {
             @Override
             public void onChanged(Collection<Beacon> beacons) {
@@ -168,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
         });
         beaconManager.startRangingBeacons(myRegion);
     }
-
 
 
     private ActivityResultLauncher<String[]> mPermissionResult = registerForActivityResult(
@@ -190,9 +190,9 @@ public class MainActivity extends AppCompatActivity {
                 (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) ||
                 (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
                 mPermissionResult.launch(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION});
-                logthis("Android 12: Asking for  have permissions ",1);
+                logthis("Android 12: Asking for  have permissions ", 1);
             } else {
-                logthis("Android 12: We have permissions ",1);
+                logthis("Android 12: We have permissions ", 1);
                 startexample();
             }
 
@@ -202,9 +202,19 @@ public class MainActivity extends AppCompatActivity {
             //I'm on not explaining why, just asking for permission.
             mPermissionResult.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_BACKGROUND_LOCATION});
         } else {
-            logthis("We have permissions ",1);
+            logthis("We have permissions ", 1);
             startexample();
         }
     }
+
+
+    @Override
+    protected void onStop() {
+        beaconManager.stopMonitoring( myRegion );
+        beaconManager.stopRangingBeacons( myRegion );
+        super.onStop();
+    }
+
+
 
 }

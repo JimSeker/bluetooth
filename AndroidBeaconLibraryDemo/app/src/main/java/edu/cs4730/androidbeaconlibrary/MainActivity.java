@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int PERMISSION_REQUESTS = 1;
     TextView logger;
+    Region myRegion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         logthis("Starting up!");
         // Set up a Live Data observer so this Activity can get monitoring callbacks
         // observer will be called each time the monitored regionState changes (inside vs. outside region)
-        Region myRegion = new Region("myMonitoringUniqueId", null, null, null);
+        myRegion = new Region("myMonitoringUniqueId", null, null, null);
         //first the monitor
         logthis("beacon monitor observer has been added.");
         beaconManager.getRegionViewModel(myRegion).getRegionState().observe(this, new Observer<Integer>() {
@@ -91,8 +92,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
-
         );
         beaconManager.startMonitoring(myRegion);
 
@@ -154,6 +153,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onStop() {
+        beaconManager.stopMonitoring( myRegion );
+        beaconManager.stopRangingBeacons( myRegion );
+        super.onStop();
+    }
+
 
     /**
      * below is all the pieces to get the permissions setup correctly and basically have nothing to do with beacons
