@@ -1,6 +1,7 @@
 package edu.cs4730.bluetoothledemo;
 
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -32,6 +33,7 @@ import java.util.UUID;
 /**
  * A simple {@link Fragment} subclass.
  */
+@SuppressLint("MissingPermission")
 public class DiscoverFragment extends Fragment {
     private final static String TAG = "DiscoverFragment";
     TextView logger;

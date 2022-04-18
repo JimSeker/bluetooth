@@ -1,6 +1,7 @@
 package edu.cs4730.bluetoothledemo;
 
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
@@ -20,12 +21,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
 /**
  * This fragment will advertise data via bluetooth LE.
  */
+@SuppressLint("MissingPermission")
 public class AdvertiseFragment extends Fragment {
     private final static String TAG = "AdvertiseFragment";
     private EditText text;
@@ -98,7 +101,7 @@ public class AdvertiseFragment extends Fragment {
             .setIncludeDeviceName(false)  //should be true, but we are bigger then 31bytes in the name?
             .addServiceUuid(pUuid)
             //this is where the text is added.
-            .addServiceData(pUuid, text.getText().toString().getBytes(Charset.forName("UTF-8")))
+            .addServiceData(pUuid, text.getText().toString().getBytes(StandardCharsets.UTF_8))
             .build();
         advertisingCallback = new AdvertiseCallback() {
             @Override

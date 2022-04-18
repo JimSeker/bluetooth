@@ -4,6 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/seker/git/bluetooth/blueToothDemo/app/src/main/res/layout/activity_main.xml" value="0.2006340579710145" />
+        <entry key="..\:/Users/seker/git/bluetooth/blueToothDemo/app/src/main/res/layout/fragment_client.xml" value="0.15577507598784193" />
+        <entry key="..\:/Users/seker/git/bluetooth/blueToothDemo/app/src/main/res/layout/fragment_help.xml" value="0.15577507598784193" />
+        <entry key="..\:/Users/seker/git/bluetooth/blueToothDemo/app/src/main/res/layout/fragment_server.xml" value="0.15577507598784193" />
       </map>
     </option>
   </component>

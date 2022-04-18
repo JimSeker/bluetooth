@@ -9,7 +9,7 @@ import android.os.Bundle;
 public class MainActivity extends AppCompatActivity implements Help_Fragment.OnFragmentInteractionListener,
    ListenerFragment.OnFragmentInteractionListener {
 
-    public static final int REQUEST_ACCESS_COURSE_LOCATION= 1;
+   //public static final int REQUEST_ACCESS_COURSE_LOCATION= 1;
     FragmentManager fragmentManager;
     String TAG = "MainActivity";
     ListenerFragment listfrag;

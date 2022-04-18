@@ -1,21 +1,11 @@
 package edu.cs4730.blescannerdemo;
 
-import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,8 +13,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+
+import java.util.Map;
+
 /**
- * A simple {@link Fragment} subclass.
+ * helper class to make sure bluetooth is one and we have the correct permissions.
  */
 public class Help_Fragment extends Fragment {
 
@@ -34,7 +34,9 @@ public class Help_Fragment extends Fragment {
      * This is the callback variable, for the button to launch the server or client fragment from the mainActivity.
      */
     private OnFragmentInteractionListener mListener;
-    ActivityResultLauncher<Intent> someActivityResultLauncher;
+    ActivityResultLauncher<Intent> bluetoothActivityResultLauncher;
+    private String[] REQUIRED_PERMISSIONS;
+    ActivityResultLauncher<String[]> rpl;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -42,21 +44,44 @@ public class Help_Fragment extends Fragment {
      * selections.
      */
     public interface OnFragmentInteractionListener {
-        /**
-         * Callback for when an item has been selected.
-         */
-        public void onButtonSelected(int id);
+        // Callback for when an item has been selected.
+        void onButtonSelected(int id);
     }
-
 
     //bluetooth device and code to turn the device on if needed.
     BluetoothAdapter mBluetoothAdapter = null;
-    private static final int REQUEST_ENABLE_BT = 2;
-    Button btn_client, btn_server;
+    Button btn_client;
     TextView logger;
 
     public Help_Fragment() {
-        // Required empty public constructor
+        //for asking to turn on the bluetooth.
+        bluetoothActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        Intent data = result.getData();
+                        logthis("Bluetooth is on.");
+                    } else {
+                        logthis("Please turn the bluetooth on.");
+                    }
+                }
+            });
+        rpl = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+            new ActivityResultCallback<Map<String, Boolean>>() {
+                @Override
+                public void onActivityResult(Map<String, Boolean> isGranted) {
+                    boolean granted = true;
+                    for (Map.Entry<String, Boolean> x : isGranted.entrySet()) {
+                        logthis(x.getKey() + " is " + x.getValue());
+                        if (!x.getValue()) granted = false;
+                    }
+                    if (granted) startbt();
+                }
+            }
+        );
     }
 
     //This code will check to see if there is a bluetooth device and
@@ -72,7 +97,7 @@ public class Help_Fragment extends Fragment {
         if (!mBluetoothAdapter.isEnabled()) {
             logthis("There is bluetooth, but turned off");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            someActivityResultLauncher.launch(enableBtIntent);
+            bluetoothActivityResultLauncher.launch(enableBtIntent);
         } else {
             logthis("The bluetooth is ready to use.");
         }
@@ -86,6 +111,15 @@ public class Help_Fragment extends Fragment {
         View myView = inflater.inflate(R.layout.fragment_help, container, false);
         logger = (TextView) myView.findViewById(R.id.logger1);
 
+        //setup the correct permissions needed, depending on which version. (31 changed the permissions.).
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            REQUIRED_PERMISSIONS = new String[]{"android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT"};
+            logthis("Android 12+, we need scan and connect.");
+        } else {
+            REQUIRED_PERMISSIONS = new String[]{"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION", "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"};
+            logthis("Android 11 or less, location and bluetooth permissions.");
+        }
+        //this allows us to check in the fragment instead of doing it all in the activity.
 
         btn_client = (Button) myView.findViewById(R.id.button2);
         btn_client.setOnClickListener(new View.OnClickListener() {
@@ -95,8 +129,7 @@ public class Help_Fragment extends Fragment {
                     mListener.onButtonSelected(2);
             }
         });
-        startbt();
-        logthis("We have permission to course location");
+
         return myView;
     }
 
@@ -104,37 +137,28 @@ public class Help_Fragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        checkpermissions();
-    }
-
-    void checkpermissions() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            if ((ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) ) {
-                ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN},
-                    MainActivity.REQUEST_ACCESS_COURSE_LOCATION);
-            }
-            logthis("Android 12, we need scan and connect.");
-        } else if ((ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-            (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-            (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) ||
-            (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED)) {
-            //I'm on not explaining why, just asking for permission.
-            logthis("asking for permissions");
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH},
-                MainActivity.REQUEST_ACCESS_COURSE_LOCATION);
-            logthis("We don't have permission to course location");
-        } else {
-            logthis("We have permissions ");
+        if (!allPermissionsGranted())
+            rpl.launch(REQUIRED_PERMISSIONS);
+        else {
+            logthis("All permissions have been granted already.");
+            startbt();
         }
     }
 
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(requireContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * This is all for the callbacks
      */
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
             mListener = (OnFragmentInteractionListener) requireActivity();
@@ -142,20 +166,7 @@ public class Help_Fragment extends Fragment {
             throw new ClassCastException(requireActivity().toString()
                 + " must implement OnFragmentInteractionListener");
         }
-        someActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        // There are no request codes
-                        Intent data = result.getData();
-                        logthis("Bluetooth is on.");
-                    } else {
-                        logthis("Please turn the bluetooth on.");
-                    }
-                }
-            });
+
     }
 
     @Override
