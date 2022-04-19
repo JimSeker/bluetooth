@@ -97,7 +97,7 @@ public class HelpFragment extends Fragment {
         //setup the correct permissions needed, depending on which version. (31 changed the permissions.).
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             REQUIRED_PERMISSIONS = new String[]{"android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT", "android.permission.BLUETOOTH_ADVERTISE"};
-            logthis("Android 12+, we need scan and connect.");
+            logthis("Android 12+, we need scan, advertise, and connect.");
         } else {
             REQUIRED_PERMISSIONS = new String[]{ "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"};
             logthis("Android 11 or less, bluetooth permissions only ");

@@ -1,10 +1,14 @@
 package edu.cs4730.bluetoothleperipheral;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
@@ -27,8 +31,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -38,23 +44,26 @@ import java.util.UUID;
  * https://code.tutsplus.com/tutorials/how-to-advertise-android-as-a-bluetooth-le-peripheral--cms-25426
  * https://github.com/PaulTR/BluetoohLEAdvertising
  *
- * The premissions are not checked, you need to set the manually.
+ * The permissions are not checked, you need to set the manually.
  *
  */
-
+@SuppressLint("MissingPermission")
 public class MainActivity extends AppCompatActivity {
-    private TextView mText;
+    private TextView logger;
+    final String TAG = "MainActivity";
     private Button mAdvertiseButton;
     private Button mDiscoverButton;
 
     private BluetoothLeScanner mBluetoothLeScanner;
     private Handler mHandler = new Handler();
+    private String[] REQUIRED_PERMISSIONS;
+    ActivityResultLauncher<String[]> rpl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mText = findViewById(R.id.text);
+        logger = findViewById(R.id.logger);
         mDiscoverButton = findViewById(R.id.discover_btn);
         mAdvertiseButton = findViewById(R.id.advertize_btn);
 
@@ -75,10 +84,33 @@ public class MainActivity extends AppCompatActivity {
             mAdvertiseButton.setEnabled(false);
             mDiscoverButton.setEnabled(false);
         }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            REQUIRED_PERMISSIONS = new String[]{"android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT", "android.permission.BLUETOOTH_ADVERTISE"};
+            logthis("Android 12+, we need scan, advertise, and connect.");
+        } else {
+            REQUIRED_PERMISSIONS = new String[]{ "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN"};
+            logthis("Android 11 or less, bluetooth permissions only ");
+        }
+        rpl = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+            new ActivityResultCallback<Map<String, Boolean>>() {
+                @Override
+                public void onActivityResult(Map<String, Boolean> isGranted) {
+                    boolean granted = true;
+                    for (Map.Entry<String, Boolean> x : isGranted.entrySet()) {
+                        logthis(x.getKey() + " is " + x.getValue());
+                        if (!x.getValue()) granted = false;
+                    }
+
+                }
+            }
+        );
+
     }
-
-
-
+    //A simple method to append data to the logger textview.
+    public void logthis(String msg) {
+        logger.append(msg + "\n");
+        Log.d(TAG, msg);
+    }
 
     void advertise() {
         BluetoothLeAdvertiser advertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
@@ -94,23 +126,32 @@ public class MainActivity extends AppCompatActivity {
         AdvertiseData data = new AdvertiseData.Builder()
             .setIncludeDeviceName(false)
             .addServiceUuid(pUuid)
-            .addServiceData(pUuid, "LE Demo".getBytes(Charset.forName("UTF-8")))
+            .addServiceData(pUuid, "LE Demo".getBytes(StandardCharsets.UTF_8))
             .build();
         AdvertiseCallback advertisingCallback = new AdvertiseCallback() {
             @Override
             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+                logthis("Starting advertising");
                 super.onStartSuccess(settingsInEffect);
             }
 
             @Override
             public void onStartFailure(int errorCode) {
-                Log.e("BLE", "Advertising onStartFailure: " + errorCode);
+                logthis( "Advertising onStartFailure: " + errorCode);
                 super.onStartFailure(errorCode);
             }
         };
 
         advertiser.startAdvertising(settings, data, advertisingCallback);
-        //advertiser.stopAdvertising(advertisingCallback);
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                advertiser.stopAdvertising(advertisingCallback);
+                logthis("Stopped Advertising");
+            }
+        }, 10000);
+
     }
 
     private ScanCallback mScanCallback = new ScanCallback() {
@@ -126,17 +167,18 @@ public class MainActivity extends AppCompatActivity {
 
             builder.append("\n").append(new String(result.getScanRecord().getServiceData(result.getScanRecord().getServiceUuids().get(0)), Charset.forName("UTF-8")));
 
-            mText.setText(builder.toString());
+            logthis(builder.toString());
         }
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
+            logthis("We have batch results, this I'm not processing.");
             super.onBatchScanResults(results);
         }
 
         @Override
         public void onScanFailed(int errorCode) {
-            Log.e("BLE", "Discovery onScanFailed: " + errorCode);
+            logthis( "Discovery onScanFailed: " + errorCode);
             super.onScanFailed(errorCode);
 
         }
@@ -155,12 +197,36 @@ public class MainActivity extends AppCompatActivity {
             .setScanMode( ScanSettings.SCAN_MODE_LOW_LATENCY )
             .build();
         mBluetoothLeScanner.startScan(filters, settings, mScanCallback);
+        logthis("Started discovery");
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mBluetoothLeScanner.stopScan(mScanCallback);
+                logthis("Stopped discovery");
             }
         }, 10000);
     }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!allPermissionsGranted())
+            rpl.launch(REQUIRED_PERMISSIONS);
+        else {
+            logthis("All permissions have been granted already.");
+        }
+    }
+
+
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 }
