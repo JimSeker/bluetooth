@@ -118,9 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
-
 
     /**
      * Setup and start the observers here.
