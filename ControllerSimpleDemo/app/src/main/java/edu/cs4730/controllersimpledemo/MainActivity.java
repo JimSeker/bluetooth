@@ -143,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //From Google's page on controller-input
-    public ArrayList getGameControllerIds() {
-        ArrayList gameControllerDeviceIds = new ArrayList();
+    public ArrayList<Integer> getGameControllerIds() {
+        ArrayList<Integer> gameControllerDeviceIds = new ArrayList<Integer>();
         int[] deviceIds = InputDevice.getDeviceIds();
         for (int deviceId : deviceIds) {
             InputDevice dev = InputDevice.getDevice(deviceId);
