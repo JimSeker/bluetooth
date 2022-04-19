@@ -72,7 +72,7 @@ public class AdvertiseFragment extends Fragment {
     }
 
     /**
-     * This will stop the adversting.  It needs the callback that is created in the start advertising.
+     * This will stop the advertising.  It needs the callback that is created in the start advertising.
      */
     private void stop_advertise() {
         if (advertisingCallback != null && advertising)
