@@ -1,12 +1,7 @@
 package edu.cs4730.androidbeaconlibrarydemo2;
 
-import android.Manifest;
-import android.content.Context;
-
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -17,32 +12,32 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
-import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
-import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+
+/**
+ *
+ *  more complex version with seperate fragments for the  found vs range.
+ *  Note, for some reason, on android 11 (pixel2) location is automatically denied.  I've updated the permissions to try and fix it, still doesn't work.
+ *    so you have to manually give it permissions.
+ */
 
 public class MainActivity extends AppCompatActivity {
 
     private BeaconManager beaconManager;
     private static final String TAG = "MainActivity";
-    private static final int PERMISSION_REQUESTS = 1;
+    private String[] REQUIRED_PERMISSIONS;
+    ActivityResultLauncher<String[]> rpl;
     HomeFragment homeFrag;
     RangeFragment rangeFrag;
     myViewModel mViewModel;
@@ -55,6 +50,33 @@ public class MainActivity extends AppCompatActivity {
 
         //setup the view model first.
         mViewModel = new ViewModelProvider(this).get(myViewModel.class);
+        //setup the correct permissions needed, depending on which version. (31 changed the permissions.).
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            REQUIRED_PERMISSIONS = new String[]{"android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT", "android.permission.ACCESS_FINE_LOCATION"};
+            logthis("Android 12+, we need scan and connect.", 1);
+        } else {
+            REQUIRED_PERMISSIONS = new String[]{"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.FOREGROUND_SERVICE"};
+            logthis("Android 11 or less, location and bluetooth permissions.", 1);
+        }
+
+        rpl = registerForActivityResult(
+            new ActivityResultContracts.RequestMultiplePermissions(),
+            new ActivityResultCallback<Map<String, Boolean>>() {
+                @Override
+                public void onActivityResult(Map<String, Boolean> result) {
+                    boolean granted = true;
+                    for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+                        logthis( entry.getKey() + " " + entry.getValue(),1);
+                        if (!entry.getValue()) granted = false;
+                    }
+                    if (granted)
+                        startexample();
+                    else
+                        logthis("Don't have permissions",1);
+
+                }
+            });
+
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnItemSelectedListener(
@@ -93,7 +115,12 @@ public class MainActivity extends AppCompatActivity {
 
         homeFrag = new HomeFragment();
         rangeFrag = new RangeFragment();
-        checkpermissions();
+        if (!allPermissionsGranted())
+            rpl.launch(REQUIRED_PERMISSIONS);
+        else {
+            logthis("All permissions have been granted already.", 1);
+            startexample();
+        }
 
         getSupportFragmentManager().beginTransaction()
             .add(R.id.container, homeFrag)
@@ -168,51 +195,22 @@ public class MainActivity extends AppCompatActivity {
         beaconManager.startRangingBeacons(myRegion);
     }
 
-
-    private ActivityResultLauncher<String[]> mPermissionResult = registerForActivityResult(
-        new ActivityResultContracts.RequestMultiplePermissions(),
-        new ActivityResultCallback<Map<String, Boolean>>() {
-            @Override
-            public void onActivityResult(Map<String, Boolean> result) {
-                for (Map.Entry<String, Boolean> entry : result.entrySet()) {
-                    Log.wtf(TAG, entry.getKey() + " " + entry.getValue());
-                    startexample();
-                }
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
             }
-        });
-
-    //until this runs as api31, don't know if needs scan or connect, so just leaving it.
-    void checkpermissions() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-                mPermissionResult.launch(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION});
-                logthis("Android 12: Asking for  have permissions ", 1);
-            } else {
-                logthis("Android 12: We have permissions ", 1);
-                startexample();
-            }
-
-        } else if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-            (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) ||
-            (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            //I'm on not explaining why, just asking for permission.
-            mPermissionResult.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_BACKGROUND_LOCATION});
-        } else {
-            logthis("We have permissions ", 1);
-            startexample();
         }
+        return true;
     }
 
 
     @Override
     protected void onStop() {
-        beaconManager.stopMonitoring( myRegion );
-        beaconManager.stopRangingBeacons( myRegion );
+        beaconManager.stopMonitoring(myRegion);
+        beaconManager.stopRangingBeacons(myRegion);
         super.onStop();
     }
-
 
 
 }

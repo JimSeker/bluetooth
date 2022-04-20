@@ -13,7 +13,6 @@ import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 
 import java.util.Collection;
-import java.util.List;
 
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;

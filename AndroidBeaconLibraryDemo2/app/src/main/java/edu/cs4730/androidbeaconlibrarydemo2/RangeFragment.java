@@ -10,7 +10,6 @@ import android.widget.TextView;
 import org.altbeacon.beacon.Beacon;
 
 import java.util.Collection;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,9 +60,10 @@ public class RangeFragment extends Fragment {
 
         return root;
     }
+
     public void logthis(String item) {
         if (logger != null)
-        logger.setText(item);
+            logger.setText(item);
     }
 
 }
