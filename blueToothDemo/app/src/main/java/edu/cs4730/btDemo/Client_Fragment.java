@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Set;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -29,6 +31,7 @@ import android.widget.TextView;
 /**
  * A simple {@link Fragment} subclass.
  */
+@SuppressLint("MissingPermission") //I really do check.
 public class Client_Fragment extends Fragment {
     static final String TAG = "client";
     TextView output;
@@ -44,7 +47,7 @@ public class Client_Fragment extends Fragment {
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
-        public boolean handleMessage(Message msg) {
+        public boolean handleMessage(@NonNull Message msg) {
             output.append(msg.getData().getString("msg"));
             return true;
         }
@@ -105,7 +108,7 @@ public class Client_Fragment extends Fragment {
         if (pairedDevices.size() > 0) {
             // Loop through paired devices
             output.append("at least 1 paired device\n");
-            final BluetoothDevice blueDev[] = new BluetoothDevice[pairedDevices.size()];
+            final BluetoothDevice[] blueDev = new BluetoothDevice[pairedDevices.size()];
             String[] items = new String[blueDev.length];
             int i = 0;
             for (BluetoothDevice devicel : pairedDevices) {

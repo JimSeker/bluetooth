@@ -1,6 +1,7 @@
 package edu.cs4730.blescannerdemo;
 
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -72,7 +73,7 @@ public class ListenerFragment extends Fragment {
         //logger = myView.findViewById(R.id.s_output);
         //listview
         list = myView.findViewById(R.id.list);
-        myAdapter = new myArrayAdapter(getActivity(),	myList);
+        myAdapter = new myArrayAdapter(requireActivity(),	myList);
         list.setAdapter(myAdapter);
 
         btn_start = myView.findViewById(R.id.start_server);
@@ -105,7 +106,7 @@ public class ListenerFragment extends Fragment {
         });
         return myView;
     }
-
+    @SuppressLint("MissingPermission")
     public void startScanning() {
 
         scanner = adapter.getBluetoothLeScanner();
@@ -120,6 +121,7 @@ public class ListenerFragment extends Fragment {
 
     public class MyScanCallback extends ScanCallback {
 
+        @SuppressLint("MissingPermission")
         @Override
         public void onScanResult(int callbackType, final ScanResult result) {
             //Do something with results
@@ -142,7 +144,7 @@ public class ListenerFragment extends Fragment {
             //Handle error
         }
     }
-
+    @SuppressLint("MissingPermission")
     public void stopScanning() {
         if (scanner != null) {
             scanner.stopScan(myScanCallback);
@@ -151,7 +153,7 @@ public class ListenerFragment extends Fragment {
 
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
         if (context instanceof OnFragmentInteractionListener) {

@@ -1,6 +1,7 @@
 package edu.cs4730.blescannerdemo;
 
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -11,7 +12,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,75 +87,76 @@ public class GattFragment extends Fragment {
 //
     }
 
+    @SuppressLint("MissingPermission")
     public void start() {
         name.setText(device.getName() + " " + device.getAddress());
         BluetoothGatt gatt = device.connectGatt(context, false, new BluetoothGattCallback() {
-                    @Override
-                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                        super.onConnectionStateChange(gatt, status, newState);
-                        sendmsg("onConnectionStateChange");
-                        if (newState == BluetoothGatt.STATE_CONNECTED)
-                            gatt.discoverServices();
+                @Override
+                public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                    super.onConnectionStateChange(gatt, status, newState);
+                    sendmsg("onConnectionStateChange");
+                    if (newState == BluetoothGatt.STATE_CONNECTED)
+                        gatt.discoverServices();
 
-                    }
+                }
 
-                    @Override
-                    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-                        super.onServicesDiscovered(gatt, status);
-                        sendmsg("OnserviceDiscovered");
-                        //now we can start the characteristic
-                        List<BluetoothGattService> services = gatt.getServices();
-                        BluetoothGattCharacteristic characteristic = null;
-                        for (BluetoothGattService service : services) {
+                @Override
+                public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                    super.onServicesDiscovered(gatt, status);
+                    sendmsg("OnserviceDiscovered");
+                    //now we can start the characteristic
+                    List<BluetoothGattService> services = gatt.getServices();
+                    BluetoothGattCharacteristic characteristic = null;
+                    for (BluetoothGattService service : services) {
 
-                            sendmsg("UUID IS " + service.getUuid().toString());
-                            for (BluetoothGattCharacteristic serviceCharacteristic : service.getCharacteristics()) {
+                        sendmsg("UUID IS " + service.getUuid().toString());
+                        for (BluetoothGattCharacteristic serviceCharacteristic : service.getCharacteristics()) {
 
-                                characteristic = serviceCharacteristic;
-                                sendmsg("char name is " + characteristic.toString());
-                                boolean successfullyRead = gatt.readCharacteristic(characteristic);
-                                sendmsg("Read characteristic " + successfullyRead);
+                            characteristic = serviceCharacteristic;
+                            sendmsg("char name is " + characteristic.toString());
+                            boolean successfullyRead = gatt.readCharacteristic(characteristic);
+                            sendmsg("Read characteristic " + successfullyRead);
 
-                                List<BluetoothGattDescriptor> descriptors = serviceCharacteristic.getDescriptors();
-                                sendmsg("descriptor size is " + descriptors.size());
-                                for (BluetoothGattDescriptor descriptor : descriptors) {
-                                    sendmsg("desc name is " + descriptor.toString());
-                                    successfullyRead = gatt.readDescriptor(descriptor);
-                                    sendmsg("Read descriptor " + successfullyRead);
-                                }
+                            List<BluetoothGattDescriptor> descriptors = serviceCharacteristic.getDescriptors();
+                            sendmsg("descriptor size is " + descriptors.size());
+                            for (BluetoothGattDescriptor descriptor : descriptors) {
+                                sendmsg("desc name is " + descriptor.toString());
+                                successfullyRead = gatt.readDescriptor(descriptor);
+                                sendmsg("Read descriptor " + successfullyRead);
                             }
                         }
                     }
+                }
 
-                    @Override
-                    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                        super.onCharacteristicRead(gatt, characteristic, status);
-                        sendmsg("OnCharacteristicRead");
-                        if (status == BluetoothGatt.GATT_SUCCESS) {
-                            byte[] characteristicValue = characteristic.getValue();
-                            sendmsg("char is " + characteristicValue.toString());
+                @Override
+                public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                    super.onCharacteristicRead(gatt, characteristic, status);
+                    sendmsg("OnCharacteristicRead");
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        byte[] characteristicValue = characteristic.getValue();
+                        sendmsg("char is " + characteristicValue.toString());
 
-                        } else if (status == BluetoothGatt.GATT_READ_NOT_PERMITTED) {
-                            sendmsg("No permitted to read a characteristic");
-                        } else if (status == BluetoothGatt.GATT_FAILURE) {
-                            sendmsg("failed to read a characteristic");
-                        }
-                    }
-
-                    @Override
-                    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-                        super.onDescriptorRead(gatt, descriptor, status);
-                        sendmsg("onDescriptorRead");
-                        if (status == BluetoothGatt.GATT_SUCCESS) {
-                            byte[] descriptorValue = descriptor.getValue();
-                            sendmsg("Descriptor: " + descriptorValue.toString());
-                        } else if (status == BluetoothGatt.GATT_READ_NOT_PERMITTED) {
-                            sendmsg("No permitted to read a descriptor");
-                        } else if (status == BluetoothGatt.GATT_FAILURE) {
-                            sendmsg("failed to read a descriptor");
-                        }
+                    } else if (status == BluetoothGatt.GATT_READ_NOT_PERMITTED) {
+                        sendmsg("No permitted to read a characteristic");
+                    } else if (status == BluetoothGatt.GATT_FAILURE) {
+                        sendmsg("failed to read a characteristic");
                     }
                 }
+
+                @Override
+                public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+                    super.onDescriptorRead(gatt, descriptor, status);
+                    sendmsg("onDescriptorRead");
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        byte[] descriptorValue = descriptor.getValue();
+                        sendmsg("Descriptor: " + descriptorValue.toString());
+                    } else if (status == BluetoothGatt.GATT_READ_NOT_PERMITTED) {
+                        sendmsg("No permitted to read a descriptor");
+                    } else if (status == BluetoothGatt.GATT_FAILURE) {
+                        sendmsg("failed to read a descriptor");
+                    }
+                }
+            }
         );
 
 
@@ -164,7 +169,7 @@ public class GattFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
     }

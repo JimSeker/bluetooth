@@ -1,15 +1,17 @@
 package edu.cs4730.blescannerdemo;
 
 import android.bluetooth.BluetoothDevice;
+
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
 //https://arnhem.luminis.eu/creating-a-bluetooth-low-energy-central-implementation-on-android/
 public class MainActivity extends AppCompatActivity implements Help_Fragment.OnFragmentInteractionListener,
-   ListenerFragment.OnFragmentInteractionListener {
+    ListenerFragment.OnFragmentInteractionListener {
 
-   //public static final int REQUEST_ACCESS_COURSE_LOCATION= 1;
     FragmentManager fragmentManager;
     String TAG = "MainActivity";
     ListenerFragment listfrag;
@@ -23,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements Help_Fragment.OnF
 
         fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.frag_container, new Help_Fragment()).commit();
-
 
 
     }

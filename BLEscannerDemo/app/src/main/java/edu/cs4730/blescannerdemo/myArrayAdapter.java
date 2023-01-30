@@ -1,9 +1,11 @@
 package edu.cs4730.blescannerdemo;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 
 import androidx.annotation.NonNull;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,7 @@ public class myArrayAdapter extends ArrayAdapter<BluetoothDevice> {
         notifyDataSetInvalidated();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView name, address;
