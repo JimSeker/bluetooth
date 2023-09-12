@@ -8,9 +8,10 @@ import android.os.Bundle;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import edu.cs4730.controllersimpledemo.databinding.ActivityMainBinding;
 
 /**
  * A simple demo to show how to get input from a bluetooth controller
@@ -19,20 +20,14 @@ import java.util.ArrayList;
  */
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity {
-
-    TextView name, last, logger;
-
+    ActivityMainBinding binding;
     Boolean isJoyStick = false, isGamePad = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        name = findViewById(R.id.Name);
-        last = findViewById(R.id.lastBtn);
-        logger = findViewById(R.id.logger);
-
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         // getGameControllerIds();
 
     }
@@ -56,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
             xaxis = motionEvent.getAxisValue(MotionEvent.AXIS_X);
             yaxis = motionEvent.getAxisValue(MotionEvent.AXIS_Y);
 
-            last.setText("JoyStick");
-            logger.append("JoyStick: X " + xaxis + " Y " + yaxis + "\n");
+            binding.lastBtn.setText("JoyStick");
+            binding.logger.append("JoyStick: X " + xaxis + " Y " + yaxis + "\n");
             handled = true;
         }
 
@@ -69,32 +64,31 @@ public class MainActivity extends AppCompatActivity {
             // LEFT and RIGHT direction accordingly.
             if (Float.compare(xaxis, -1.0f) == 0) {
                 // Dpad.LEFT;
-                last.setText("Dpad Left");
+                binding.lastBtn.setText("Dpad Left");
                 handled = true;
             } else if (Float.compare(xaxis, 1.0f) == 0) {
                 // Dpad.RIGHT;
-                last.setText("Dpad Right");
+                binding.lastBtn.setText("Dpad Right");
                 handled = true;
             }
             // Check if the AXIS_HAT_Y value is -1 or 1, and set the D-pad
             // UP and DOWN direction accordingly.
             else if (Float.compare(yaxis, -1.0f) == 0) {
                 // Dpad.UP;
-                last.setText("Dpad Up");
+                binding.lastBtn.setText("Dpad Up");
                 handled = true;
             } else if (Float.compare(yaxis, 1.0f) == 0) {
                 // Dpad.DOWN;
-                last.setText("Dpad Down");
+                binding.lastBtn.setText("Dpad Down");
                 handled = true;
-            } else if ((Float.compare(xaxis, 0.0f) == 0)
-                && (Float.compare(yaxis, 0.0f) == 0)) {
+            } else if ((Float.compare(xaxis, 0.0f) == 0) && (Float.compare(yaxis, 0.0f) == 0)) {
                 //Dpad.center
-                last.setText("Dpad centered");
+                binding.lastBtn.setText("Dpad centered");
                 handled = true;
             }
             if (!handled) {
-                last.setText("Unknown");
-                logger.append("unhandled: X " + xaxis + " Y " + yaxis + "\n");
+                binding.lastBtn.setText("Unknown");
+                binding.logger.append("unhandled: X " + xaxis + " Y " + yaxis + "\n");
             }
 
         }
@@ -106,39 +100,35 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean dispatchKeyEvent(android.view.KeyEvent event) {
         boolean handled = false;
-        if ((event.getSource() & InputDevice.SOURCE_GAMEPAD)
-            == InputDevice.SOURCE_GAMEPAD) {
+        if ((event.getSource() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) {
 
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_BUTTON_X:
-                        last.setText("X Button");
+                        binding.lastBtn.setText("X Button");
                         handled = true;
                         break;
                     case KeyEvent.KEYCODE_BUTTON_A:
-                        last.setText("A Button");
+                        binding.lastBtn.setText("A Button");
                         handled = true;
                         break;
                     case KeyEvent.KEYCODE_BUTTON_Y:
-                        last.setText("Y Button");
+                        binding.lastBtn.setText("Y Button");
                         handled = true;
                         break;
                     case KeyEvent.KEYCODE_BUTTON_B:
-                        last.setText("B Button");
+                        binding.lastBtn.setText("B Button");
                         handled = true;
                         break;
                 }
-                if (!handled)
-                    logger.append("code is " + event.getKeyCode() + "\n");
+                if (!handled) binding.logger.append("code is " + event.getKeyCode() + "\n");
             } else if (event.getAction() == KeyEvent.ACTION_UP) {
                 //don't care, but need to handle it.
                 handled = true;
             } else {
-                logger.append("unknown action " + event.getAction());
+                binding.logger.append("unknown action " + event.getAction());
             }
-            return handled;
         }
-
         return handled;
     }
 
@@ -151,10 +141,9 @@ public class MainActivity extends AppCompatActivity {
             int sources = dev.getSources();
 
             // Verify that the device has gamepad buttons, control sticks, or both.
-            if (((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)
-                || ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)) {
+            if (((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) || ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)) {
                 // This device is a game controller. Store its device ID.
-                name.setText(dev.getName());
+                binding.Name.setText(dev.getName());
                 if (!gameControllerDeviceIds.contains(deviceId)) {
                     gameControllerDeviceIds.add(deviceId);
                 }
@@ -163,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
                     isGamePad = true;
                 if ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)
                     isJoyStick = true;
-                logger.append("GamePad: " + isGamePad + "\n");
-                logger.append("JoyStick: " + isJoyStick + "\n");
+                binding.logger.append("GamePad: " + isGamePad + "\n");
+                binding.logger.append("JoyStick: " + isJoyStick + "\n");
             }
 
         }
