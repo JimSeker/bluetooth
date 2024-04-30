@@ -1,13 +1,12 @@
 package edu.cs4730.controllersimpledemo;
 
 import android.annotation.SuppressLint;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 

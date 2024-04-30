@@ -1,12 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 32
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.controllersample"
-        minSdkVersion 26
-        targetSdkVersion 32
+        minSdkVersion 28
+        targetSdkVersion 34
+        versionCode="1"
+        versionName="1.0"
     }
 
     buildTypes {
@@ -15,9 +17,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
+    namespace 'com.example.controllersample'
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
