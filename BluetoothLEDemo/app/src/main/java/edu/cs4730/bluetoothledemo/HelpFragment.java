@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -20,9 +21,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
 
 import java.util.Map;
+
+import edu.cs4730.bluetoothledemo.databinding.FragmentHelpBinding;
 
 
 /**
@@ -35,7 +38,7 @@ public class HelpFragment extends Fragment {
     ActivityResultLauncher<String[]> rpl;
     //bluetooth device and code to turn the device on if needed.
     BluetoothAdapter mBluetoothAdapter = null;
-    TextView logger;
+    FragmentHelpBinding binding;
 
     public HelpFragment() {
         bluetoothActivityResultLauncher = registerForActivityResult(
@@ -88,34 +91,34 @@ public class HelpFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View myView = inflater.inflate(R.layout.fragment_help, container, false);
-        logger = myView.findViewById(R.id.loggerh);
+        binding = FragmentHelpBinding.inflate(inflater, container, false);
+
         //setup the correct permissions needed, depending on which version. (31 changed the permissions.).
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADVERTISE};
             logthis("Android 12+, we need scan, advertise, and connect.");
         } else {
-            REQUIRED_PERMISSIONS = new String[]{ Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION};
+            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION};
             logthis("Android 11 or less, bluetooth permissions only ");
         }
 
 
-        myView.findViewById(R.id.btn_advertise).setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_help_to_advertise));
-        myView.findViewById(R.id.btn_discover).setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_help_to_discover));
-        myView.findViewById(R.id.btn_perm).setOnClickListener(new View.OnClickListener() {
+        binding.btnAdvertise.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_help_to_advertise));
+        binding.btnDiscover.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_help_to_discover));
+        binding.btnPerm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rpl.launch(REQUIRED_PERMISSIONS);
             }
         });
-        return myView;
+        return binding.getRoot();
     }
 
     public void logthis(String msg) {
-        logger.append(msg + "\n");
+        binding.loggerh.append(msg + "\n");
         Log.d(TAG, msg);
     }
 
@@ -129,6 +132,7 @@ public class HelpFragment extends Fragment {
             startbt();
         }
     }
+
     private boolean allPermissionsGranted() {
         for (String permission : REQUIRED_PERMISSIONS) {
             if (ContextCompat.checkSelfPermission(requireContext(), permission) != PackageManager.PERMISSION_GRANTED) {
