@@ -25,6 +25,8 @@ import org.altbeacon.beacon.Region;
 import java.util.Collection;
 import java.util.Map;
 
+import edu.cs4730.androidbeaconlibrarydemo2.databinding.ActivityMainBinding;
+
 /**
  *
  *  more complex version with seperate fragments for the  found vs range.
@@ -42,11 +44,13 @@ public class MainActivity extends AppCompatActivity {
     RangeFragment rangeFrag;
     myViewModel mViewModel;
     Region myRegion;
+    ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         //setup the view model first.
         mViewModel = new ViewModelProvider(this).get(myViewModel.class);
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             REQUIRED_PERMISSIONS = new String[]{"android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT", "android.permission.ACCESS_FINE_LOCATION"};
             logthis("Android 12+, we need scan and connect.", 1);
         } else {
-            REQUIRED_PERMISSIONS = new String[]{"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.FOREGROUND_SERVICE"};
+            REQUIRED_PERMISSIONS = new String[]{"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_BACKGROUND_LOCATION"};
             logthis("Android 11 or less, location and bluetooth permissions.", 1);
         }
 
@@ -78,19 +82,19 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        navView.setOnItemSelectedListener(
+
+        binding.navView.setOnItemSelectedListener(
             new BottomNavigationView.OnItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     if (item.getItemId() == R.id.navigation_home) {
                         getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, homeFrag)
+                            .replace(binding.container.getId(), homeFrag)
                             .commit();
                         return true;
                     } else if (item.getItemId() == R.id.navigation_notifications) {
                         getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, rangeFrag)
+                            .replace(binding.container.getId(), rangeFrag)
                             .commit();
                         return true;
                     }
@@ -123,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         getSupportFragmentManager().beginTransaction()
-            .add(R.id.container, homeFrag)
+            .add(binding.container.getId(), homeFrag)
             .commit();
 
     }

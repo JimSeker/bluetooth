@@ -3,12 +3,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "edu.cs4730.androidbeaconlibrary"
-        minSdkVersion 26
-        targetSdkVersion 33
+        minSdkVersion 28
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -25,16 +25,17 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    namespace 'edu.cs4730.androidbeaconlibrary'
 }
 
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     //https://mvnrepository.com/artifact/org.altbeacon/android-beacon-library  to find newer version.
-    implementation 'org.altbeacon:android-beacon-library:2.19.5'
+    implementation 'org.altbeacon:android-beacon-library:2.20.6'
 
 
 }

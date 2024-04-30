@@ -39,7 +39,7 @@ import java.util.UUID;
 
 
 /**
- * This is mostly another person's example with fixes and setup for API 29.
+ * This is mostly another person's example with fixes and setup for API 34.
  *
  * https://code.tutsplus.com/tutorials/how-to-advertise-android-as-a-bluetooth-le-peripheral--cms-25426
  * https://github.com/PaulTR/BluetoohLEAdvertising

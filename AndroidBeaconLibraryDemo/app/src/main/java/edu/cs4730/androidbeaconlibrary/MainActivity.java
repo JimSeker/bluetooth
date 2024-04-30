@@ -36,16 +36,45 @@ public class MainActivity extends AppCompatActivity {
 
     private BeaconManager beaconManager;
     private static final String TAG = "MainActivity";
-    private static final int PERMISSION_REQUESTS = 1;
+    private String[] REQUIRED_PERMISSIONS;
     TextView logger;
     Region myRegion;
+
+    //the piece for permissions.
+    private ActivityResultLauncher<String[]> rpl = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+        @Override
+        public void onActivityResult(Map<String, Boolean> isGranted) {
+            boolean granted = true;
+            for (Map.Entry<String, Boolean> x : isGranted.entrySet()) {
+                logthis(x.getKey() + " is " + x.getValue());
+                if (!x.getValue()) granted = false;
+            }
+            if (granted) startexample();
+            else
+                logthis("Don't have permissions");
+        }
+    });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         logger = findViewById(R.id.logger);
+        //which permissions are needed at varying apis.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.ACCESS_FINE_LOCATION};
+            logthis("Android 12+, we need scan and connect.");
+        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            //this one may not work, but I don't have a 29 to test with, access_background_location may not be needed here.  it breaks the one above, so I remove it and now it works.
+            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+            logthis("api 29 for background access  ");
+        } else {
+            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+            logthis("api 28 or less fine location only.  ");
+        }
+
+
         logthis("App Starting");
         //check for permissions and start the beacons.
         beaconManager = BeaconManager.getInstanceForApplication(this);
@@ -56,10 +85,14 @@ public class MainActivity extends AppCompatActivity {
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_TLM_LAYOUT));
         // Detect the URL frame:
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
-        checkpermissions();
+
+        if (!allPermissionsGranted()) rpl.launch(REQUIRED_PERMISSIONS);
+        else {
+            logthis("All permissions have been granted already.");
+            startexample();
+        }
 
     }
-
 
     void startexample() {
         logthis("Starting up!");
@@ -69,20 +102,18 @@ public class MainActivity extends AppCompatActivity {
         //first the monitor
         logthis("beacon monitor observer has been added.");
         beaconManager.getRegionViewModel(myRegion).getRegionState().observe(this, new Observer<Integer>() {
-                @Override
-                public void onChanged(Integer state) {
-                    if (state == MonitorNotifier.INSIDE) {
-                        Log.d(TAG, "Detected beacons(s)");
-                        logthis("I can see at least one beacon");
-                    }
-                    else {
-                        Log.d(TAG, "Stopped detecting beacons");
-                        logthis("I no longer see an beacon");
+            @Override
+            public void onChanged(Integer state) {
+                if (state == MonitorNotifier.INSIDE) {
+                    Log.d(TAG, "Detected beacons(s)");
+                    logthis("I can see at least one beacon");
+                } else {
+                    Log.d(TAG, "Stopped detecting beacons");
+                    logthis("I no longer see an beacon");
 
-                    }
                 }
             }
-        );
+        });
         beaconManager.startMonitoring(myRegion);
 
         //now the ranged information.
@@ -96,30 +127,23 @@ public class MainActivity extends AppCompatActivity {
                         // This is a Eddystone-UID frame
                         Identifier namespaceId = beacon.getId1();
                         Identifier instanceId = beacon.getId2();
-                        logthis("I see a beacon transmitting namespace id: " + namespaceId +
-                            " and instance id: " + instanceId +
-                            " approximately " + beacon.getDistance() + " meters away.");
+                        logthis("I see a beacon transmitting namespace id: " + namespaceId + " and instance id: " + instanceId + " approximately " + beacon.getDistance() + " meters away.");
 
                         // Do we have telemetry data?
-                        if (beacon.getExtraDataFields().size() > 0) {
+                        if (!beacon.getExtraDataFields().isEmpty()) {
                             long telemetryVersion = beacon.getExtraDataFields().get(0);
                             long batteryMilliVolts = beacon.getExtraDataFields().get(1);
                             long pduCount = beacon.getExtraDataFields().get(3);
                             long uptime = beacon.getExtraDataFields().get(4);
 
-                            logthis(
-                                "The above beacon is sending telemetry version " + telemetryVersion +
-                                    ", has been up for : " + uptime + " seconds" +
-                                    ", has a battery level of " + batteryMilliVolts + " mV" +
-                                    ", and has transmitted " + pduCount + " advertisements.");
+                            logthis("The above beacon is sending telemetry version " + telemetryVersion + ", has been up for : " + uptime + " seconds" + ", has a battery level of " + batteryMilliVolts + " mV" + ", and has transmitted " + pduCount + " advertisements.");
 
                         }
 
                     } else if (beacon.getServiceUuid() == 0xfeaa && beacon.getBeaconTypeCode() == 0x10) {
                         // This is a Eddystone-URL frame
                         String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
-                        logthis("I see a beacon transmitting a url: " + url +
-                            " approximately " + beacon.getDistance() + " meters away.");
+                        logthis("I see a beacon transmitting a url: " + url + " approximately " + beacon.getDistance() + " meters away.");
                     } else {
                         //no clue what we found here.
                         logthis("found a beacon, (not eddy) " + beacon.toString() + " and is approximately " + beacon.getDistance() + "meters away");
@@ -146,50 +170,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        beaconManager.stopMonitoring( myRegion );
-        beaconManager.stopRangingBeacons( myRegion );
+        beaconManager.stopMonitoring(myRegion);
+        beaconManager.stopRangingBeacons(myRegion);
         super.onStop();
     }
 
-
-    /**
-     * below is all the pieces to get the permissions setup correctly and basically have nothing to do with beacons
-     * See the manifest file for all the permissions this app is using.
-     */
-    private ActivityResultLauncher<String[]> mPermissionResult = registerForActivityResult(
-        new ActivityResultContracts.RequestMultiplePermissions(),
-        new ActivityResultCallback<Map<String, Boolean>>() {
-            @Override
-            public void onActivityResult(Map<String, Boolean> result) {
-                for (Map.Entry<String, Boolean> entry : result.entrySet()) {
-                    Log.wtf(TAG, entry.getKey() + " " + entry.getValue());
-                    startexample();
-                }
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
             }
-        });
-
-    //until this runs as api31, don't know if needs scan or connect, so just leaving it.
-    void checkpermissions() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) ||
-                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-                mPermissionResult.launch(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION});
-                logthis("Android 12: Asking for  have permissions ");
-            } else {
-                logthis("Android 12: We have permissions ");
-                startexample();
-            }
-
-        } else if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
-            (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) ||
-            (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            //I'm on not explaining why, just asking for permission.
-            mPermissionResult.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACCESS_BACKGROUND_LOCATION});
-        } else {
-            logthis("We have permissions ");
-            startexample();
         }
+        return true;
     }
-
 }

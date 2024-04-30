@@ -20,31 +20,30 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import edu.cs4730.androidbeaconlibrarydemo2.databinding.FragmentRangeBinding;
+
 /**
  * This needs to have a recycler view associated with it and display the data that way, otherwise,
  * it's impossible to follow.
  */
 
 public class RangeFragment extends Fragment {
-    TextView logger;
+    FragmentRangeBinding binding;
     private myViewModel mViewModel;
-    RecyclerView mRecyclerView;
     myAdapter mAdapter;
     String TAG = "RangeFragment";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.fragment_range, container, false);
-        logger = root.findViewById(R.id.text_notifications);
-        //setup recyclerview here
-        mRecyclerView = root.findViewById(R.id.recyclerview);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        binding = FragmentRangeBinding.inflate(inflater, container, false);
 
+        //setup recyclerview here
+        binding.recyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerview.setItemAnimator(new DefaultItemAnimator());
         mAdapter = new myAdapter(null, R.layout.row_layout, getContext());
         //add the adapter to the recyclerview
-        mRecyclerView.setAdapter(mAdapter);
+        binding.recyclerview.setAdapter(mAdapter);
 
 
         //setup the view model first.
@@ -57,13 +56,12 @@ public class RangeFragment extends Fragment {
             }
         });
 
-
-        return root;
+        return binding.getRoot();
     }
 
     public void logthis(String item) {
-        if (logger != null)
-            logger.setText(item);
+        if (binding != null)
+            binding.textNotifications.setText(item);
     }
 
 }
