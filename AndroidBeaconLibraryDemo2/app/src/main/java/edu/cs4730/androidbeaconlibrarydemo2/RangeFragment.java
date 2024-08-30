@@ -60,7 +60,7 @@ public class RangeFragment extends Fragment {
     }
 
     public void logthis(String item) {
-        if (binding != null)
+        if (binding != null)  //it's pcould be called, because onCreateView is called.
             binding.textNotifications.setText(item);
     }
 
