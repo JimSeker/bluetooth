@@ -19,8 +19,8 @@ import edu.cs4730.controllersimpledemo.databinding.ActivityMainBinding;
  */
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity {
-    ActivityMainBinding binding;
-    Boolean isJoyStick = false, isGamePad = false;
+    private ActivityMainBinding binding;
+    private Boolean isJoyStick = false, isGamePad = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //From Google's page on controller-input
-    public ArrayList<Integer> getGameControllerIds() {
+    private ArrayList<Integer> getGameControllerIds() {
         ArrayList<Integer> gameControllerDeviceIds = new ArrayList<Integer>();
         int[] deviceIds = InputDevice.getDeviceIds();
         for (int deviceId : deviceIds) {

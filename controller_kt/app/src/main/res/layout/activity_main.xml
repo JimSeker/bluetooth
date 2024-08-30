@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="8dp"
+    android:paddingTop="8dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="8dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Controller Demo" />
+
+    <TextView
+        android:id="@+id/Textview1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:text="Controller Name:" />
+
+    <TextView
+        android:id="@+id/Name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/button_push"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Last button/dpad pushed" />
+
+    <TextView
+        android:id="@+id/lastBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="None" />
+
+    <TextView
+        android:id="@+id/TextView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Logger:" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/logger"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="" />
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>
