@@ -1,4 +1,4 @@
-package edu.cs4730.controller_kt
+package edu.cs4730.controllersimpledemo_kt
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -6,7 +6,8 @@ import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
-import edu.cs4730.controller_kt.databinding.ActivityMainBinding
+import edu.cs4730.controllersimpledemo_kt.databinding.ActivityMainBinding
+
 
 @SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity() {

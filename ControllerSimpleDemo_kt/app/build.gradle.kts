@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "edu.cs4730.controller_kt"
+    namespace = "edu.cs4730.controllersimpledemo_kt"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "edu.cs4730.controller_kt"
+        applicationId = "edu.cs4730.controllersimpledemo_kt"
         minSdk = 29
         targetSdk = 35
         versionCode = 1
@@ -44,6 +44,5 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
-
 
 }

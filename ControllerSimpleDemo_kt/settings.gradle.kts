@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "controller_kt"
+rootProject.name = "ControllerSimpleDemo_kt"
 include(":app")
- 
