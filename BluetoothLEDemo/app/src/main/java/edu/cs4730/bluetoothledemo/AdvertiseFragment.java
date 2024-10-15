@@ -51,7 +51,7 @@ public class AdvertiseFragment extends Fragment {
             public void onClick(View v) {
                 if (advertising) { //turn it off
                     stop_advertise();
-                } else { //turn on adversting
+                } else { //turn on advertising
                     start_advertise();
                 }
             }

@@ -4,7 +4,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
@@ -43,8 +42,6 @@ import java.util.UUID;
  *
  * https://code.tutsplus.com/tutorials/how-to-advertise-android-as-a-bluetooth-le-peripheral--cms-25426
  * https://github.com/PaulTR/BluetoohLEAdvertising
- *
- * The permissions are not checked, you need to set the manually.
  *
  */
 @SuppressLint("MissingPermission")
