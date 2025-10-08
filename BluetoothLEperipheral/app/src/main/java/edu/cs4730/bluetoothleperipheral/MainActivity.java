@@ -11,7 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
@@ -24,12 +24,11 @@ import android.bluetooth.le.ScanSettings;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.ParcelUuid;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.nio.charset.Charset;
@@ -39,61 +38,63 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import edu.cs4730.bluetoothleperipheral.databinding.ActivityMainBinding;
+
 
 /**
  * This is mostly another person's example with fixes and setup for API 34.
- *
+ * <p>
  * https://code.tutsplus.com/tutorials/how-to-advertise-android-as-a-bluetooth-le-peripheral--cms-25426
  * https://github.com/PaulTR/BluetoohLEAdvertising
- *
  */
 @SuppressLint("MissingPermission")
 public class MainActivity extends AppCompatActivity {
-    private TextView logger;
     final String TAG = "MainActivity";
-    private Button mAdvertiseButton;
-    private Button mDiscoverButton;
 
     private BluetoothLeScanner mBluetoothLeScanner;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private String[] REQUIRED_PERMISSIONS;
     ActivityResultLauncher<String[]> rpl;
+
+    ActivityMainBinding binding;
+    BluetoothManager bluetoothManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return WindowInsetsCompat.CONSUMED;
         });
-        logger = findViewById(R.id.logger);
-        mDiscoverButton = findViewById(R.id.discover_btn);
-        mAdvertiseButton = findViewById(R.id.advertize_btn);
 
-        mDiscoverButton.setOnClickListener(new View.OnClickListener() {
+        binding.discoverBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 discover();
             }
         });
-        mAdvertiseButton.setOnClickListener(new View.OnClickListener() {
+        binding.advertizeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 advertise();
             }
         });
-        if (!BluetoothAdapter.getDefaultAdapter().isMultipleAdvertisementSupported()) {
+
+        bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+
+        if (!bluetoothManager.getAdapter().isMultipleAdvertisementSupported()) {
             Toast.makeText(this, "Multiple advertisement not supported", Toast.LENGTH_SHORT).show();
-            mAdvertiseButton.setEnabled(false);
-            mDiscoverButton.setEnabled(false);
+            binding.advertizeBtn.setEnabled(false);
+            binding.discoverBtn.setEnabled(false);
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADVERTISE};
             logthis("Android 12+, we need scan, advertise, and connect.");
         } else {
-            REQUIRED_PERMISSIONS = new String[]{ Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION};
+            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION};
             logthis("Android 11 or less, bluetooth permissions only ");
         }
         rpl = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
@@ -111,14 +112,15 @@ public class MainActivity extends AppCompatActivity {
         );
 
     }
+
     //A simple method to append data to the logger textview.
     public void logthis(String msg) {
-        logger.append(msg + "\n");
+        binding.logger.append(msg + "\n");
         Log.d(TAG, msg);
     }
 
     void advertise() {
-        BluetoothLeAdvertiser advertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
+        BluetoothLeAdvertiser advertiser = bluetoothManager.getAdapter().getBluetoothLeAdvertiser();
         //define the power settings  could use ADVERTISE_MODE_LOW_POWER, ADVERTISE_MODE_BALANCED too.
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         ParcelUuid pUuid = new ParcelUuid(UUID.fromString(getString(R.string.ble_uuid)));
 
         AdvertiseData data = new AdvertiseData.Builder()
-            .setIncludeDeviceName(false)
+            .setIncludeDeviceName(true)
             .addServiceUuid(pUuid)
             .addServiceData(pUuid, "LE Demo".getBytes(StandardCharsets.UTF_8))
             .build();
@@ -142,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStartFailure(int errorCode) {
-                logthis( "Advertising onStartFailure: " + errorCode);
+                logthis("Advertising onStartFailure: " + errorCode);
                 super.onStartFailure(errorCode);
             }
         };
@@ -159,16 +161,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private ScanCallback mScanCallback = new ScanCallback() {
+    private final ScanCallback mScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            if (result == null
-                || result.getDevice() == null
-                || TextUtils.isEmpty(result.getDevice().getName()))
-                return;
 
-            StringBuilder builder = new StringBuilder(result.getDevice().getName());
+            //no data or result to work with, so return.
+            if (result == null || result.getDevice() == null) return;
+
+            StringBuilder builder;
+            if (TextUtils.isEmpty(result.getDevice().getName()))
+                builder = new StringBuilder("No Name");
+            else
+                builder = new StringBuilder(result.getDevice().getName());
 
             builder.append("\n").append(new String(result.getScanRecord().getServiceData(result.getScanRecord().getServiceUuids().get(0)), Charset.forName("UTF-8")));
 
@@ -183,23 +188,23 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onScanFailed(int errorCode) {
-            logthis( "Discovery onScanFailed: " + errorCode);
+            logthis("Discovery onScanFailed: " + errorCode);
             super.onScanFailed(errorCode);
 
         }
     };
 
     void discover() {
-        mBluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner();
+        mBluetoothLeScanner = bluetoothManager.getAdapter().getBluetoothLeScanner();
 
         ScanFilter filter = new ScanFilter.Builder()
-            .setServiceUuid( new ParcelUuid(UUID.fromString( getString(R.string.ble_uuid ) ) ) )
+            .setServiceUuid(new ParcelUuid(UUID.fromString(getString(R.string.ble_uuid))))
             .build();
         List<ScanFilter> filters = new ArrayList<ScanFilter>();
-        filters.add( filter );
+        filters.add(filter);
 
         ScanSettings settings = new ScanSettings.Builder()
-            .setScanMode( ScanSettings.SCAN_MODE_LOW_LATENCY )
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .build();
         mBluetoothLeScanner.startScan(filters, settings, mScanCallback);
         logthis("Started discovery");
