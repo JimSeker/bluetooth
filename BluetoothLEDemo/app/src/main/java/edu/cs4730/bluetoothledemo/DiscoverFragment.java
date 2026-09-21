@@ -2,6 +2,7 @@ package edu.cs4730.bluetoothledemo;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
@@ -11,9 +12,11 @@ import android.bluetooth.le.ScanSettings;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.ParcelUuid;
 
 import android.util.Log;
@@ -39,7 +42,7 @@ public class DiscoverFragment extends Fragment {
     private Boolean discovering = false;
 
     private BluetoothLeScanner mBluetoothLeScanner;
-    private final Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     public DiscoverFragment() {
         // Required empty public constructor
@@ -63,7 +66,8 @@ public class DiscoverFragment extends Fragment {
             }
         });
 
-        mBluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner();
+        BluetoothManager bluetoothManager = ContextCompat.getSystemService(requireContext(), BluetoothManager.class);
+        mBluetoothLeScanner = bluetoothManager != null ? bluetoothManager.getAdapter().getBluetoothLeScanner() : null;
         return binding.getRoot();
     }
 

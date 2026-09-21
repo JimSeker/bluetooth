@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import edu.cs4730.btDemo.databinding.FragmentClientBinding;
@@ -64,7 +66,12 @@ public class Client_Fragment extends Fragment {
             }
         });
         //setup the bluetooth adapter.
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //This is deprecated in Android (starting from API level 31 / Android 12).
+        // mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //new way
+        BluetoothManager bluetoothManager = ContextCompat.getSystemService(requireContext(), BluetoothManager.class);
+        mBluetoothAdapter = bluetoothManager != null ? bluetoothManager.getAdapter() : null;
+
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
             logthis("No bluetooth device.\n");

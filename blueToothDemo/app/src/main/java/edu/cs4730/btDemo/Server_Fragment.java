@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 
@@ -36,7 +39,7 @@ public class Server_Fragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentServerBinding.inflate(inflater, container, false);
 
@@ -49,9 +52,12 @@ public class Server_Fragment extends Fragment {
             }
         });
 
-
         //setup the bluetooth adapter.
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //This is deprecated in Android (starting from API level 31 / Android 12).
+        // mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //new way
+        BluetoothManager bluetoothManager = ContextCompat.getSystemService(requireContext(), BluetoothManager.class);
+        mBluetoothAdapter = bluetoothManager != null ? bluetoothManager.getAdapter() : null;
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
             logthis("No bluetooth device.\n");
@@ -68,7 +74,7 @@ public class Server_Fragment extends Fragment {
     /**
      * This thread runs while listening for incoming connections. It behaves
      * like a server-side client. It runs until a connection is accepted
-     * (or until cancelled).
+     * (or until canceled).
      */
     private class AcceptThread extends Thread {
         // The local server socket

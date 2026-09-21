@@ -1,7 +1,7 @@
 package edu.cs4730.bluetoothledemo;
 
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import java.nio.charset.StandardCharsets;
@@ -43,8 +44,8 @@ public class AdvertiseFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentAdvertiseBinding.inflate(inflater, container, false);
-
-        advertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
+        BluetoothManager bluetoothManager = ContextCompat.getSystemService(requireContext(), BluetoothManager.class);
+        advertiser = bluetoothManager != null ? bluetoothManager.getAdapter().getBluetoothLeAdvertiser() : null;
 
         binding.advertise.setOnClickListener(new View.OnClickListener() {
             @Override
