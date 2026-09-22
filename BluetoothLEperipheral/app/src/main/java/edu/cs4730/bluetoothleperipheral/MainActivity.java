@@ -90,13 +90,13 @@ public class MainActivity extends AppCompatActivity {
             binding.advertizeBtn.setEnabled(false);
             binding.discoverBtn.setEnabled(false);
         }
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_ADVERTISE};
             logthis("Android 12+, we need scan, advertise, and connect.");
-        } else {
-            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION};
-            logthis("Android 11 or less, bluetooth permissions only ");
-        }
+//        } else {
+//            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION};
+//            logthis("Android 11 or less, bluetooth permissions only ");
+//        }
         rpl = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
             new ActivityResultCallback<Map<String, Boolean>>() {
                 @Override
