@@ -1,0 +1,15 @@
+[versions]
+agp = "9.4.1"
+appcompat = "1.8.0"
+constraintlayout = "2.2.2"
+material = "1.14.0"
+altbeacon = "2.21.2"
+
+[libraries]
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+altbeacon-android-beacon-library = { group = "org.altbeacon", name = "android-beacon-library", version.ref = "altbeacon" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }

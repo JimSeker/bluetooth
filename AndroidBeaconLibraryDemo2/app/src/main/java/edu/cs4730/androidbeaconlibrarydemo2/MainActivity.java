@@ -63,13 +63,13 @@ public class MainActivity extends AppCompatActivity {
         //setup the view model first.
         mViewModel = new ViewModelProvider(this).get(myViewModel.class);
         //setup the correct permissions needed, depending on which version. (31 changed the permissions.).
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             REQUIRED_PERMISSIONS = new String[]{"android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT", "android.permission.ACCESS_FINE_LOCATION"};
             logthis("Android 12+, we need scan and connect.", 1);
-        } else {
-            REQUIRED_PERMISSIONS = new String[]{"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_BACKGROUND_LOCATION"};
-            logthis("Android 11 or less, location and bluetooth permissions.", 1);
-        }
+//        } else {
+//            REQUIRED_PERMISSIONS = new String[]{"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_BACKGROUND_LOCATION"};
+//            logthis("Android 11 or less, location and bluetooth permissions.", 1);
+//        }
 
         rpl = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         logthis("App Starting", 0);
         //check for permissions and start the beacons.
         beaconManager = BeaconManager.getInstanceForApplication(this);
-        //added eddystone, since I'm moving from google's beacons to altbeacon.  RedBeacon can broadcast both.
+        //added eddystone, since I'm moving from Google's beacons to altbeacon.  RedBeacon can broadcast both.
         // Detect the main identifier (UID) frame:
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT));
         // Detect the telemetry (TLM) frame:

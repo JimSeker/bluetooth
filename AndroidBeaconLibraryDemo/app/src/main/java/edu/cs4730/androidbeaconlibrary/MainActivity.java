@@ -70,17 +70,17 @@ public class MainActivity extends AppCompatActivity {
         });
         logger = findViewById(R.id.logger);
         //which permissions are needed at varying apis.
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             REQUIRED_PERMISSIONS = new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.ACCESS_FINE_LOCATION};
             logthis("Android 12+, we need scan and connect.");
-        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            //this one may not work, but I don't have a 29 to test with, access_background_location may not be needed here.  it breaks the one above, so I remove it and now it works.
-            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
-            logthis("api 29 for background access  ");
-        } else {
-            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
-            logthis("api 28 or less fine location only.  ");
-        }
+//        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+//            //this one may not work, but I don't have a 29 to test with, access_background_location may not be needed here.  it breaks the one above, so I remove it and now it works.
+//            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+//            logthis("api 29 for background access  ");
+//        } else {
+//            REQUIRED_PERMISSIONS = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+//            logthis("api 28 or less fine location only.  ");
+//        }
 
 
         logthis("App Starting");
