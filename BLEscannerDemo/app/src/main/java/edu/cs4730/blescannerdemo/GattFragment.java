@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
@@ -61,9 +62,9 @@ public class GattFragment extends Fragment {
     }
 
     //handler which can update the screen and in this case show the html and messages.
-    private Handler handler = new Handler(new Handler.Callback() {
+    private Handler handler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
         @Override
-        public boolean handleMessage(Message msg) {
+        public boolean handleMessage(@NonNull Message msg) {
             logthis(msg.getData().getString("msg"));
             return true;
         }
