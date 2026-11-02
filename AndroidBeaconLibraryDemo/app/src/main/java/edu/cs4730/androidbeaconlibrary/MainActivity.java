@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * very beginning of a beacon replacement example since google is dropping all support.
+ * very beginning of a beacon replacement example since Google has dropped all support.
  * <p>
  * https://altbeacon.github.io/android-beacon-library/index.html
  * https://github.com/AltBeacon
